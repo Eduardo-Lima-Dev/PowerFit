@@ -1,8 +1,15 @@
 package com.example.powerfit.Model
 
-data class User(val email: String, val password: String) {
+data class User(
+    val name: String,
+    val email: String,
+    val password: String,
+    val confirmPassword: String
+) {
     fun isValid(): Boolean {
-        // Valide o e-mail e a senha conforme necessário
-        return email.isNotEmpty() && password.length >= 6
+        // Validação básica de dados
+        return email.isNotEmpty() &&
+                password.length >= 6 &&
+                password == confirmPassword
     }
 }

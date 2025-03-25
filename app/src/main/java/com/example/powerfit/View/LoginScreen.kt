@@ -37,26 +37,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.powerfit.Controller.LoginController
+import androidx.navigation.NavController
 import com.example.powerfit.Model.User
 import com.example.powerfit.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(controller: LoginController) {
+fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -85,6 +84,7 @@ fun LoginScreen(controller: LoginController) {
                     .size(160.dp)
                     .padding(bottom = 24.dp)
             )
+
             // Login Form
             Card(
                 modifier = Modifier
@@ -147,7 +147,7 @@ fun LoginScreen(controller: LoginController) {
                             )
                         },
                         singleLine = true,
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Password,
                             imeAction = ImeAction.Done
@@ -173,9 +173,10 @@ fun LoginScreen(controller: LoginController) {
                     // Login Button
                     Button(
                         onClick = {
-                            val user = User(email, password)
+                            val user = User(name = "", email = email, password = password, confirmPassword = password)
                             if (user.isValid()) {
-                                controller.onLoginSuccess()
+                                // Sucesso no login, por enquanto, apenas navega para "register" para testes
+                                navController.navigate("register")
                             } else {
                                 errorMessage = "Credenciais inválidas"
                             }
@@ -197,36 +198,23 @@ fun LoginScreen(controller: LoginController) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Forgot Password
-                    TextButton(
-                        onClick = { /* Handle forgot password */ },
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    // Register Option
+                    Row(
+                        modifier = Modifier.padding(top = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "Esqueceu sua senha?",
-                            color = MaterialTheme.colorScheme.primary
+                            "Não tem uma conta?",
+                            color = MaterialTheme.colorScheme.onBackground
                         )
+                        TextButton(onClick = { navController.navigate("register") }) {
+                            Text(
+                                "Registre-se",
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Register Option
-            Row(
-                modifier = Modifier.padding(top = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    "Não tem uma conta?",
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                TextButton(onClick = { /* Handle registration */ }) {
-                    Text(
-                        "Registre-se",
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
                 }
             }
         }
@@ -237,6 +225,6 @@ fun LoginScreen(controller: LoginController) {
 @Composable
 fun PreviewLoginScreen() {
     MaterialTheme {
-        LoginScreen(controller = LoginController())
+        LoginScreen(navController = NavController(LocalContext.current))
     }
 }
