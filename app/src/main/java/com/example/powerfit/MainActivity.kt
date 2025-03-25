@@ -14,6 +14,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.powerfit.Controller.LoginController
 import com.example.powerfit.Controller.RegistrationController
 import com.example.powerfit.View.LoginScreen
+import com.example.powerfit.View.RecoverPasswordScreen
+import com.example.powerfit.View.RecoverSentScreen
 import com.example.powerfit.View.RegistrationScreen
 import com.example.powerfit.ui.theme.PowerFitTheme
 
@@ -48,6 +50,18 @@ fun SetupNavHost() {
             RegistrationScreen(
                 navController = navController,
                 controller = RegistrationController()
+            )
+        }
+        composable("recover") {
+            // Passando o navController para RecoverPasswordScreen
+            RecoverPasswordScreen(
+                navController = navController,
+            )
+        }
+        composable("recoverSent") {
+            // Passando o navController para RecoverSentScreen
+            RecoverSentScreen(
+                navController = navController,
             )
         }
     }

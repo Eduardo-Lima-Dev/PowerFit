@@ -205,11 +205,29 @@ fun LoginScreen(navController: NavController) {
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    //Redefine Password
+                    Row(
+                        modifier = Modifier.padding(top = 8.dp, bottom = 0.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "Esqueceu a senha?",
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        TextButton(onClick = { navController.navigate("recover") }) {
+                            Text(
+                                "Recupere-a",
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
 
                     // Register Option
                     Row(
-                        modifier = Modifier.padding(top = 16.dp),
+                        modifier = Modifier.padding(top = 0.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
