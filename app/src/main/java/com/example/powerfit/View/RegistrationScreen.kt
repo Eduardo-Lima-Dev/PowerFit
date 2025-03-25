@@ -86,7 +86,16 @@ fun RegistrationScreen(navController: NavHostController, controller: Registratio
                 contentDescription = "PowerFit Logo",
                 modifier = Modifier
                     .size(160.dp)
-                    .padding(bottom = 24.dp)
+                    .padding(bottom = 6.dp)
+            )
+
+            // Text
+            Text(
+                text = "PowerFit",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 26.dp)
             )
 
             // Registration Form
