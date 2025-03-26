@@ -15,12 +15,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -44,8 +46,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.powerfit.Model.User
 import com.example.powerfit.R
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
 
 @Composable
 fun RecoverPasswordScreen(navController: NavController) {
@@ -169,7 +169,8 @@ fun RecoverPasswordScreen(navController: NavController) {
                                     name = "",
                                     email = email,
                                     password = "",
-                                    confirmPassword = ""
+                                    confirmPassword = "",
+                                    profileImage = R.drawable.profile_image
                                 )
 
                                 navController.navigate("recoverSent")

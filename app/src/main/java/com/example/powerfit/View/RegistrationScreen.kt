@@ -239,7 +239,7 @@ fun RegistrationScreen(navController: NavHostController, controller: Registratio
                     // Register Button
                     Button(
                         onClick = {
-                            val user = User(name, email, password, confirmPassword)
+                            val user = User(name, email, password, confirmPassword, R.drawable.profile_image)
                             if (user.isValid()) {
                                 controller.onRegisterSuccess()
                             } else {

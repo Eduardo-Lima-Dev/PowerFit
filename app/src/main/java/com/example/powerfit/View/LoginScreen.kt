@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -72,7 +73,8 @@ fun LoginScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(24.dp)
+                .imePadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -182,10 +184,15 @@ fun LoginScreen(navController: NavController) {
                     // Login Button
                     Button(
                         onClick = {
-                            val user = User(name = "", email = email, password = password, confirmPassword = password)
-                            if (user.isValid()) {
-                                // Sucesso no login, por enquanto, apenas navega para "register" para testes
-                                navController.navigate("register")
+                            val user = User(
+                                name = "", email = email, password = password, confirmPassword = password, profileImage = 0
+                            )
+                            if (user.isValid() && email == "narak@example.com" && password == "password123") {
+                                // Se as credenciais forem válidas, navegue para a HomeScreen
+                                navController.navigate("home") {
+                                    // Limpa a pilha de navegação para que o usuário não volte para a tela de login
+                                    popUpTo("login") { inclusive = true }
+                                }
                             } else {
                                 errorMessage = "Credenciais inválidas"
                             }

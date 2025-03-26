@@ -1,5 +1,6 @@
 package com.example.powerfit
 
+import com.jakewharton.threetenabp.AndroidThreeTen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.powerfit.Controller.LoginController
 import com.example.powerfit.Controller.RegistrationController
+import com.example.powerfit.View.HomeScreen
 import com.example.powerfit.View.LoginScreen
 import com.example.powerfit.View.RecoverPasswordScreen
 import com.example.powerfit.View.RecoverSentScreen
@@ -24,6 +26,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AndroidThreeTen.init(this)
         controller = LoginController()
         setContent {
             PowerFitTheme {
@@ -63,6 +66,10 @@ fun SetupNavHost() {
             RecoverSentScreen(
                 navController = navController,
             )
+        }
+        composable("home") {
+            // Passando o navController para HomeScreen
+            HomeScreen(navController = navController)
         }
     }
 }

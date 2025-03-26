@@ -67,4 +67,7 @@ dependencies {
     implementation ("androidx.activity:activity-compose:1.7.2")
 
     implementation ("androidx.navigation:navigation-compose:2.4.0-beta01")
+
+    implementation (libs.threetenabp)
+    implementation ("com.jakewharton.threetenabp:threetenabp:1.4.6")
 }
