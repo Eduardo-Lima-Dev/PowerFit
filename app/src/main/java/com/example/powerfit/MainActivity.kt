@@ -12,14 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.powerfit.Controller.LoginController
-import com.example.powerfit.Controller.RegistrationController
-import com.example.powerfit.View.HomeScreen
-import com.example.powerfit.View.LoginScreen
-import com.example.powerfit.View.RecoverPasswordScreen
-import com.example.powerfit.View.RecoverSentScreen
-import com.example.powerfit.View.RegistrationScreen
+import com.example.powerfit.controller.LoginController
+import com.example.powerfit.controller.RegistrationController
 import com.example.powerfit.ui.theme.PowerFitTheme
+import com.example.powerfit.view.ExerciseSelectionScreen
+import com.example.powerfit.view.HomeScreen
+import com.example.powerfit.view.LoginScreen
+import com.example.powerfit.view.RecoverPasswordScreen
+import com.example.powerfit.view.RecoverSentScreen
+import com.example.powerfit.view.RegistrationScreen
 
 class MainActivity : ComponentActivity() {
     private lateinit var controller: LoginController
@@ -43,7 +44,7 @@ class MainActivity : ComponentActivity() {
 fun SetupNavHost() {
     val navController = rememberNavController() // Criando o NavController aqui
 
-    NavHost(navController = navController, startDestination = "login") {
+    NavHost(navController = navController, startDestination = "home") {
         composable("login") {
             // Passando o navController para a tela de LoginScreen
             LoginScreen(navController = navController)
@@ -70,6 +71,10 @@ fun SetupNavHost() {
         composable("home") {
             // Passando o navController para HomeScreen
             HomeScreen(navController = navController)
+        }
+        composable("exercises") {
+            // Passando o navController para HomeScreen
+            ExerciseSelectionScreen(navController = navController)
         }
     }
 }

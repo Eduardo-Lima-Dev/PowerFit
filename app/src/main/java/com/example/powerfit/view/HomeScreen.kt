@@ -1,4 +1,4 @@
-package com.example.powerfit.View
+package com.example.powerfit.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -11,15 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,16 +26,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.powerfit.Controller.HomeController
+import com.example.powerfit.controller.HomeController
+import com.example.powerfit.R
+import com.example.powerfit.ui.theme.BottomMenu
+import com.example.powerfit.ui.theme.CustomNavigationButton
 
 @Preview(showBackground = true)
 @Composable
 fun HomeScreen(navController: NavController = NavController(LocalContext.current)) {
     val controller = remember { HomeController(navController) }
     val user = controller.getUser()
-
-    // Identificar o dia da semana atual
-    val currentDayOfWeek = org.threeten.bp.LocalDate.now().dayOfWeek.value + 1
 
     Box(
         modifier = Modifier
@@ -99,7 +90,7 @@ fun HomeScreen(navController: NavController = NavController(LocalContext.current
                         text = day,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (index + 1 == currentDayOfWeek) {
+                        color = if (index % 2 != 0) {
                             MaterialTheme.colorScheme.primary
                         } else {
                             MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
@@ -123,7 +114,7 @@ fun HomeScreen(navController: NavController = NavController(LocalContext.current
                             .size(8.dp)
                             .clip(CircleShape)
                             .background(
-                                color = if (index + 1 == currentDayOfWeek) {
+                                color = if (index % 2 != 0) {
                                     MaterialTheme.colorScheme.primary
                                 } else {
                                     MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
@@ -141,59 +132,36 @@ fun HomeScreen(navController: NavController = NavController(LocalContext.current
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Button(
-                    onClick = { navController.navigate("inbox") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    Text("Iniciar", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                }
+                CustomNavigationButton(
+                    text = "Treinos",
+                    navRoute = "exercises",
+                    navController = navController,
+                    paddingTop = 50.dp,
+                    icon = R.drawable.weight_icon,
+                    iconSize = 50.dp
+                )
 
-                Button(
-                    onClick = { navController.navigate("analytics") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    Text("Análises", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                }
+                CustomNavigationButton(
+                    text = "Avaliações",
+                    navRoute = "assessments",
+                    navController = navController,
+                    paddingTop = 30.dp,
+                    icon = R.drawable.assessment_icon,
+                    iconSize = 50.dp
+                )
 
-                Button(
-                    onClick = { navController.navigate("programs") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    Text("Programas", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                }
+                CustomNavigationButton(
+                    text = "Progresso",
+                    navRoute = "progress",
+                    navController = navController,
+                    paddingTop = 30.dp,
+                    icon = R.drawable.progress_icon,
+                    iconSize = 50.dp
+                )
             }
         }
 
         // Menu Inferior de Navegação (com fundo escuro)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 0.dp)
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)) // Fundo escuro
-                .align(Alignment.BottomCenter), // Posiciona no fundo da tela
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            IconButton(onClick = { navController.navigate("home") }) {
-                Icon(Icons.Default.Home, contentDescription = "Home")
-            }
-            IconButton(onClick = { navController.navigate("search") }) {
-                Icon(Icons.Default.Search, contentDescription = "Search")
-            }
-            IconButton(onClick = { navController.navigate("settings") }) {
-                Icon(Icons.Default.Settings, contentDescription = "Settings")
-            }
-        }
+        BottomMenu(NavController(LocalContext.current))
     }
 }

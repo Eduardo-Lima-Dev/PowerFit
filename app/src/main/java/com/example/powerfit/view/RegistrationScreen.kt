@@ -1,4 +1,4 @@
-package com.example.powerfit.View
+package com.example.powerfit.view
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -48,8 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.powerfit.Controller.RegistrationController
-import com.example.powerfit.Model.User
+import com.example.powerfit.controller.RegistrationController
+import com.example.powerfit.model.User
 import com.example.powerfit.R
 
 @OptIn(ExperimentalMaterial3Api::class)

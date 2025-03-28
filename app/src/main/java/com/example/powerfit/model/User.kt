@@ -1,4 +1,4 @@
-package com.example.powerfit.Model
+package com.example.powerfit.model
 
 data class User(
     val name: String,

@@ -1,4 +1,4 @@
-package com.example.powerfit.View
+package com.example.powerfit.view
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -15,12 +15,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -42,10 +44,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.powerfit.model.User
 import com.example.powerfit.R
 
 @Composable
-fun RecoverSentScreen(navController: NavController) {
+fun RecoverPasswordScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
@@ -94,12 +97,26 @@ fun RecoverSentScreen(navController: NavController) {
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Box(modifier = Modifier.fillMaxWidth()) {
+                    IconButton(
+                        onClick = { navController.navigate("login") },
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Voltar"
+                        )
+                    }
+
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+
+
                         Text(
                             text = "Recuperação de Senha",
                             fontSize = 20.sp,
@@ -107,17 +124,39 @@ fun RecoverSentScreen(navController: NavController) {
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
 
-                        Column(
+                        // Email Field
+                        OutlinedTextField(
+                            value = email,
+                            onValueChange = {
+                                email = it
+                                errorMessage = ""
+                            },
+                            label = { Text("Email") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Email,
+                                    contentDescription = "Email Icon",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Email,
+                                imeAction = ImeAction.Next
+                            ),
+                            shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 20.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
+                                .padding(bottom = 16.dp)
+                        )
+
+                        // Error Message
+                        AnimatedVisibility(visible = errorMessage.isNotEmpty()) {
                             Text(
-                                text = "Se o email estiver cadastrado, enviaremos um link para redefinir sua senha.",
-                                fontSize = 18.sp,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(horizontal = 20.dp)
+                                text = errorMessage,
+                                color = MaterialTheme.colorScheme.error,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(vertical = 8.dp)
                             )
                         }
 
@@ -126,7 +165,15 @@ fun RecoverSentScreen(navController: NavController) {
                         // Send Button
                         Button(
                             onClick = {
-                                navController.navigate("login")
+                                val user = User(
+                                    name = "",
+                                    email = email,
+                                    password = "",
+                                    confirmPassword = "",
+                                    profileImage = R.drawable.profile_image
+                                )
+
+                                navController.navigate("recoverSent")
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -137,7 +184,7 @@ fun RecoverSentScreen(navController: NavController) {
                             )
                         ) {
                             Text(
-                                "VOLTAR",
+                                "ENVIAR",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -153,8 +200,8 @@ fun RecoverSentScreen(navController: NavController) {
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewRecoverSentScreen() {
+fun PreviewRecoverPasswordScreen() {
     MaterialTheme {
-        RecoverSentScreen(navController = NavController(LocalContext.current))
+        RecoverPasswordScreen(navController = NavController(LocalContext.current))
     }
 }

@@ -1,4 +1,4 @@
-package com.example.powerfit.Controller
+package com.example.powerfit.controller
 
 class LoginController {
     fun onLoginSuccess() {

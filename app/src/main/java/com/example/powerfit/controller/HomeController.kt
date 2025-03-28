@@ -1,7 +1,7 @@
-package com.example.powerfit.Controller
+package com.example.powerfit.controller
 
 import androidx.navigation.NavController
-import com.example.powerfit.Model.User
+import com.example.powerfit.model.User
 import com.example.powerfit.R
 
 class HomeController(navController: NavController) {
@@ -10,7 +10,7 @@ class HomeController(navController: NavController) {
         email = "narak@example.com",
         password = "password123",
         confirmPassword = "password123",
-        profileImage = R.drawable.profile_image
+        profileImage = R.drawable.profile_icon
     )
 
     fun getUser() = user
