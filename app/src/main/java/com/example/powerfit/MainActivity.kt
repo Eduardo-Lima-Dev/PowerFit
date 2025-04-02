@@ -21,6 +21,8 @@ import com.example.powerfit.view.LoginScreen
 import com.example.powerfit.view.RecoverPasswordScreen
 import com.example.powerfit.view.RecoverSentScreen
 import com.example.powerfit.view.RegistrationScreen
+import com.example.powerfit.view.ExerciseViewScreen
+import com.example.powerfit.view.SettingsScreen
 
 class MainActivity : ComponentActivity() {
     private lateinit var controller: LoginController
@@ -75,6 +77,13 @@ fun SetupNavHost() {
         composable("exercises") {
             // Passando o navController para HomeScreen
             ExerciseSelectionScreen(navController = navController)
+        }
+        composable("exerciseView") {
+            // Passando o navController para ExerciseViewScreen
+            ExerciseViewScreen(navController = navController)
+        }
+        composable("settings") {
+            SettingsScreen(navController = navController)
         }
     }
 }

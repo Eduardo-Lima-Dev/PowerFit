@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,8 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.powerfit.R
+import com.example.powerfit.components.BottomMenu
 import com.example.powerfit.controller.HomeController
-import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.ui.theme.CustomNavigationButton
 
 @Preview(showBackground = true)
@@ -59,7 +59,7 @@ fun ExerciseSelectionScreen(navController: NavController = NavController(LocalCo
                 .padding(8.dp)
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                imageVector = Icons.Filled.ArrowBack,
                 contentDescription = "Voltar"
             )
         }
@@ -102,7 +102,7 @@ fun ExerciseSelectionScreen(navController: NavController = NavController(LocalCo
             ) {
                 CustomNavigationButton(
                     text = "Superior",
-                    navRoute = "exercises/superior",
+                    navRoute = "exerciseView",
                     navController = navController,
                     paddingTop = 50.dp,
                     icon = R.drawable.superior_icon,
@@ -111,7 +111,7 @@ fun ExerciseSelectionScreen(navController: NavController = NavController(LocalCo
 
                 CustomNavigationButton(
                     text = "Costas",
-                    navRoute = "exercises/back",
+                    navRoute = "exerciseView",
                     navController = navController,
                     paddingTop = 30.dp,
                     icon = R.drawable.back_icon,
@@ -120,7 +120,7 @@ fun ExerciseSelectionScreen(navController: NavController = NavController(LocalCo
 
                 CustomNavigationButton(
                     text = "Inferior",
-                    navRoute = "exercises/back",
+                    navRoute = "exerciseView",
                     navController = navController,
                     paddingTop = 30.dp,
                     icon = R.drawable.inferior_icon,

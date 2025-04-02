@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.powerfit.controller.HomeController
 import com.example.powerfit.R
-import com.example.powerfit.ui.theme.BottomMenu
+import com.example.powerfit.components.BottomMenu
 import com.example.powerfit.ui.theme.CustomNavigationButton
 
 @Preview(showBackground = true)
