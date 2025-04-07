@@ -130,6 +130,6 @@ fun ExerciseSelectionScreen(navController: NavController = NavController(LocalCo
         }
 
         // Menu Inferior de Navegação (com fundo escuro)
-        BottomMenu(NavController(LocalContext.current))
+        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
     }
 }

@@ -9,12 +9,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.powerfit.controller.LoginController
 import com.example.powerfit.controller.RegistrationController
 import com.example.powerfit.ui.theme.PowerFitTheme
+import com.example.powerfit.view.ChartScreen
 import com.example.powerfit.view.ExerciseSelectionScreen
 import com.example.powerfit.view.HomeScreen
 import com.example.powerfit.view.LoginScreen
@@ -42,6 +44,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Preview
 @Composable
 fun SetupNavHost() {
     val navController = rememberNavController() // Criando o NavController aqui
@@ -85,5 +88,9 @@ fun SetupNavHost() {
         composable("settings") {
             SettingsScreen(navController = navController)
         }
+        composable("chart") {
+            ChartScreen(navController = navController)
+        }
+
     }
 }

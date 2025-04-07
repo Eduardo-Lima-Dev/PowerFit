@@ -152,7 +152,7 @@ fun HomeScreen(navController: NavController = NavController(LocalContext.current
 
                 CustomNavigationButton(
                     text = "Progresso",
-                    navRoute = "progress",
+                    navRoute = "chart",
                     navController = navController,
                     paddingTop = 30.dp,
                     icon = R.drawable.progress_icon,
@@ -162,6 +162,6 @@ fun HomeScreen(navController: NavController = NavController(LocalContext.current
         }
 
         // Menu Inferior de Navegação (com fundo escuro)
-        BottomMenu(NavController(LocalContext.current))
+        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
     }
 }

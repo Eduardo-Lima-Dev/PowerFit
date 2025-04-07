@@ -1,50 +1,80 @@
 package com.example.powerfit.view
 
- import androidx.compose.foundation.Image
- import androidx.compose.foundation.background
- import androidx.compose.foundation.layout.Arrangement
- import androidx.compose.foundation.layout.Box
- import androidx.compose.foundation.layout.Column
- import androidx.compose.foundation.layout.Spacer
- import androidx.compose.foundation.layout.fillMaxSize
- import androidx.compose.foundation.layout.fillMaxWidth
- import androidx.compose.foundation.layout.height
- import androidx.compose.foundation.layout.padding
- import androidx.compose.foundation.layout.size
- import androidx.compose.foundation.shape.CircleShape
- import androidx.compose.material.icons.Icons
- import androidx.compose.material.icons.filled.ArrowBack
- import androidx.compose.material3.Icon
- import androidx.compose.material3.IconButton
- import androidx.compose.material3.MaterialTheme
- import androidx.compose.material3.Text
- import androidx.compose.runtime.Composable
- import androidx.compose.runtime.remember
- import androidx.compose.runtime.rememberCoroutineScope
- import androidx.compose.ui.Alignment
- import androidx.compose.ui.Modifier
- import androidx.compose.ui.draw.clip
- import androidx.compose.ui.graphics.Brush
- import androidx.compose.ui.platform.LocalContext
- import androidx.compose.ui.res.painterResource
- import androidx.compose.ui.text.font.FontWeight
- import androidx.compose.ui.tooling.preview.Preview
- import androidx.compose.ui.unit.dp
- import androidx.compose.ui.unit.sp
- import androidx.navigation.NavController
- import com.example.powerfit.R
- import com.example.powerfit.components.BottomMenu
- import com.example.powerfit.controller.HomeController
- import com.example.powerfit.ui.theme.CustomNavigationButton
- import kotlinx.coroutines.launch
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.powerfit.R
+import com.example.powerfit.components.BottomMenu
+import com.example.powerfit.ui.theme.CustomNavigationButton
 
- @Preview(showBackground = true)
+@Preview(showBackground = true)
 @Composable
-fun SettingsScreen(navController: NavController = NavController(LocalContext.current)) {
-    val controller = remember { HomeController(navController) }
-    val user = controller.getUser()
-    val coroutineScope = rememberCoroutineScope()
+fun SettingsScreenPreview() {
+    SettingsScreen(navController = rememberNavController())
+}
 
+@Composable
+fun CustomNavigationButton(
+    text: String,
+    navRoute: String,
+    navController: NavController,
+    paddingTop: Dp = 0.dp,
+    icon: Int? = null,
+    iconSize: Dp = 24.dp
+) {
+    Button(
+        onClick = { navController.navigate(navRoute) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = paddingTop)
+    ) {
+        if (icon != null) {
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = null,
+                modifier = Modifier.size(iconSize)
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = text)
+    }
+}
+
+@Composable
+fun SettingsScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -57,27 +87,40 @@ fun SettingsScreen(navController: NavController = NavController(LocalContext.cur
                 )
             )
     ) {
+        IconButton(
+            onClick = { navController.navigate("login") },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBack,
+                contentDescription = "Voltar"
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(horizontal = 24.dp, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            // Imagem de Perfil
+            Spacer(modifier = Modifier.height(32.dp)) 
+
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                contentDescription = "Profile Picture",
+                painter = painterResource(id = R.drawable.profile_icon),
+                contentDescription = "User Profile",
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(120.dp)
                     .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                    .padding(8.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Nome do Usuário
             Text(
-                text = user.name,
+                text = "Narak",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -85,34 +128,44 @@ fun SettingsScreen(navController: NavController = NavController(LocalContext.cur
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Email do Usuário
             Text(
-                text = user.email,
+                text = "narak@example.com",
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.onBackground
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Botão Sair
             CustomNavigationButton(
-                text = "Inferior",
+                text = "Alterar foto de perfil",
+                navRoute = "profilePhotoScreen",
+                navController = navController
+            )
+
+            CustomNavigationButton(
+                text = "Chatbot",
+                navRoute = "chatbotScreen",
+                navController = navController
+            )
+
+            CustomNavigationButton(
+                text = "Alterar email",
+                navRoute = "changeEmailScreen",
+                navController = navController
+            )
+
+            CustomNavigationButton(
+                text = "Alterar senha",
+                navRoute = "changePasswordScreen",
+                navController = navController
+            )
+
+            CustomNavigationButton(
+                text = "Sair do Aplicativo",
                 navRoute = "login",
-                navController = navController,
-                paddingTop = 30.dp,
-                icon = R.drawable.inferior_icon,
-                iconSize = 50.dp
+                navController = navController
             )
         }
-
-        // Botão Voltar
-        IconButton(
-            onClick = { navController.navigate("home") },
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(8.dp)
-        ) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-        }
+        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
