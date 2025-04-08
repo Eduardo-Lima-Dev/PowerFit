@@ -44,8 +44,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.powerfit.model.User
 import com.example.powerfit.R
+import com.example.powerfit.model.User
 
 @Composable
 fun RecoverPasswordScreen(navController: NavController) {
@@ -108,6 +108,7 @@ fun RecoverPasswordScreen(navController: NavController) {
                     .clip(RoundedCornerShape(16.dp)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
+              
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -120,7 +121,7 @@ fun RecoverPasswordScreen(navController: NavController) {
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
-
+                    
                     // Email Field
                     OutlinedTextField(
                         value = email,

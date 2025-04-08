@@ -19,23 +19,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.powerfit.controller.HomeController
 import com.example.powerfit.R
 import com.example.powerfit.components.BottomMenu
+import com.example.powerfit.controller.HomeController
 import com.example.powerfit.ui.theme.CustomNavigationButton
 
-@Preview(showBackground = true)
 @Composable
-fun HomeScreen(navController: NavController = NavController(LocalContext.current)) {
-    val controller = remember { HomeController(navController) }
-    val user = controller.getUser()
+fun HomeScreen(navController: NavController) {
+    val user = remember { HomeController(navController).getUser() }
 
     Box(
         modifier = Modifier
@@ -160,7 +156,6 @@ fun HomeScreen(navController: NavController = NavController(LocalContext.current
                 )
             }
         }
-
         // Menu Inferior de Navegação (com fundo escuro)
         BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
     }
