@@ -7,31 +7,24 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -42,12 +35,12 @@ import com.example.powerfit.ui.theme.CustomNavigationButton
 
 @Preview(showBackground = true)
 @Composable
-fun SettingsScreenPreview() {
-    SettingsScreen(navController = rememberNavController())
+fun AssessmentsScreenPreview() {
+    AssessmentsScreen(navController = rememberNavController())
 }
 
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun AssessmentsScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -99,45 +92,36 @@ fun SettingsScreen(navController: NavController) {
                 color = MaterialTheme.colorScheme.onBackground
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "narak@example.com",
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
             Spacer(modifier = Modifier.height(32.dp))
 
             CustomNavigationButton(
-                text = "Alterar foto de perfil",
-                navRoute = "profilePhotoScreen",
-                navController = navController
+                text = "Peso: 80kg",
+                navRoute = "",
+                navController = navController,
+                clickable = false
             )
 
             CustomNavigationButton(
-                text = "Chatbot",
-                navRoute = "chatbotScreen",
-                navController = navController
+                text = "Altura: 165cm",
+                navRoute = "",
+                navController = navController,
+                clickable = false
             )
 
             CustomNavigationButton(
-                text = "Alterar email",
-                navRoute = "changeEmailScreen",
-                navController = navController
+                text = "Desempenho: Ótimo",
+                navRoute = "",
+                navController = navController,
+                clickable = false
             )
 
             CustomNavigationButton(
-                text = "Alterar senha",
-                navRoute = "changePasswordScreen",
-                navController = navController
+                text = "Resistência: Bom",
+                navRoute = "",
+                navController = navController,
+                clickable = false
             )
 
-            CustomNavigationButton(
-                text = "Sair",
-                navRoute = "login",
-                navController = navController
-            )
         }
         BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
     }

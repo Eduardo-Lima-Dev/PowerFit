@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.powerfit.controller.LoginController
 import com.example.powerfit.controller.RegistrationController
 import com.example.powerfit.ui.theme.PowerFitTheme
+import com.example.powerfit.view.AssessmentsScreen
 import com.example.powerfit.view.ChartScreen
 import com.example.powerfit.view.ExerciseSelectionScreen
 import com.example.powerfit.view.HomeScreen
@@ -90,6 +91,9 @@ fun SetupNavHost() {
         }
         composable("chart") {
             ChartScreen(navController = navController)
+        }
+        composable("assessments"){
+            AssessmentsScreen(navController = navController)
         }
 
     }
