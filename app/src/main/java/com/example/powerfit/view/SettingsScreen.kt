@@ -111,25 +111,25 @@ fun SettingsScreen(navController: NavController) {
 
             CustomNavigationButton(
                 text = "Alterar foto de perfil",
-                navRoute = "profilePhotoScreen",
+                navRoute = "profilePhoto",
                 navController = navController
             )
 
             CustomNavigationButton(
                 text = "Chatbot",
-                navRoute = "chatbotScreen",
+                navRoute = "chatbot",
                 navController = navController
             )
 
             CustomNavigationButton(
                 text = "Alterar email",
-                navRoute = "changeEmailScreen",
+                navRoute = "changeEmail",
                 navController = navController
             )
 
             CustomNavigationButton(
                 text = "Alterar senha",
-                navRoute = "changePasswordScreen",
+                navRoute = "changePassword",
                 navController = navController
             )
 

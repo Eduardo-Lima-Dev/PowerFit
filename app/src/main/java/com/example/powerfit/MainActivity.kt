@@ -17,6 +17,8 @@ import com.example.powerfit.controller.LoginController
 import com.example.powerfit.controller.RegistrationController
 import com.example.powerfit.ui.theme.PowerFitTheme
 import com.example.powerfit.view.AssessmentsScreen
+import com.example.powerfit.view.ChangeEmailScreen
+import com.example.powerfit.view.ChangePasswordScreen
 import com.example.powerfit.view.ChartScreen
 import com.example.powerfit.view.ExerciseSelectionScreen
 import com.example.powerfit.view.HomeScreen
@@ -94,6 +96,12 @@ fun SetupNavHost() {
         }
         composable("assessments"){
             AssessmentsScreen(navController = navController)
+        }
+        composable("changeEmail"){
+            ChangeEmailScreen(navController = navController)
+        }
+        composable("changePassword"){
+            ChangePasswordScreen(navController = navController)
         }
 
     }
