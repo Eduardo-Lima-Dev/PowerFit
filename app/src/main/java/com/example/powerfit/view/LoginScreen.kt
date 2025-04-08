@@ -185,7 +185,7 @@ fun LoginScreen(navController: NavController) {
                             val user = User(
                                 name = "", email = email, password = password, confirmPassword = password, profileImage = 0
                             )
-                            if (user.isValid() && email == "narak@example.com" && password == "password123") {
+                            if (user.isValid() && email == "narak@example.com" && password == "senha123") {
                                 // Se as credenciais forem válidas, navegue para a HomeScreen
                                 navController.navigate("home") {
                                     // Limpa a pilha de navegação para que o usuário não volte para a tela de login

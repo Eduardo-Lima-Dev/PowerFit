@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.powerfit.R
+import com.example.powerfit.components.BottomMenu
 import com.example.powerfit.controller.HomeController
 import com.example.powerfit.ui.theme.CustomNavigationButton
 
@@ -147,7 +148,7 @@ fun HomeScreen(navController: NavController) {
 
                 CustomNavigationButton(
                     text = "Progresso",
-                    navRoute = "progress",
+                    navRoute = "chart",
                     navController = navController,
                     paddingTop = 30.dp,
                     icon = R.drawable.progress_icon,
@@ -155,5 +156,7 @@ fun HomeScreen(navController: NavController) {
                 )
             }
         }
+        // Menu Inferior de Navegação (com fundo escuro)
+        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
     }
 }

@@ -19,9 +19,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @Composable
-fun BottomMenu(navController: NavController) {
+fun BottomMenu(navController: NavController, modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
             .padding(vertical = 10.dp),

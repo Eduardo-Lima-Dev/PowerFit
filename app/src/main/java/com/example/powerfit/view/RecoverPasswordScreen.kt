@@ -64,6 +64,18 @@ fun RecoverPasswordScreen(navController: NavController) {
                 )
             )
     ) {
+        IconButton(
+            onClick = { navController.navigate("login") },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBack,
+                contentDescription = "Voltar"
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -96,102 +108,87 @@ fun RecoverPasswordScreen(navController: NavController) {
                     .clip(RoundedCornerShape(16.dp)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    IconButton(
-                        onClick = { navController.navigate("login") },
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .padding(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Voltar"
-                        )
-                    }
-
-                    Column(
+              
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Recuperação de Senha",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    
+                    // Email Field
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = {
+                            email = it
+                            errorMessage = ""
+                        },
+                        label = { Text("Email") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Email,
+                                contentDescription = "Email Icon",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next
+                        ),
+                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
+                            .padding(bottom = 16.dp)
+                    )
 
-
+                    // Error Message
+                    AnimatedVisibility(visible = errorMessage.isNotEmpty()) {
                         Text(
-                            text = "Recuperação de Senha",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(bottom = 16.dp)
+                            text = errorMessage,
+                            color = MaterialTheme.colorScheme.error,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(vertical = 8.dp)
                         )
-
-                        // Email Field
-                        OutlinedTextField(
-                            value = email,
-                            onValueChange = {
-                                email = it
-                                errorMessage = ""
-                            },
-                            label = { Text("Email") },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.Email,
-                                    contentDescription = "Email Icon",
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            },
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Email,
-                                imeAction = ImeAction.Next
-                            ),
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp)
-                        )
-
-                        // Error Message
-                        AnimatedVisibility(visible = errorMessage.isNotEmpty()) {
-                            Text(
-                                text = errorMessage,
-                                color = MaterialTheme.colorScheme.error,
-                                fontSize = 14.sp,
-                                modifier = Modifier.padding(vertical = 8.dp)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Send Button
-                        Button(
-                            onClick = {
-                                val user = User(
-                                    name = "",
-                                    email = email,
-                                    password = "",
-                                    confirmPassword = "",
-                                    profileImage = R.drawable.profile_image
-                                )
-
-                                navController.navigate("recoverSent")
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary
-                            )
-                        ) {
-                            Text(
-                                "ENVIAR",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
                     }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Send Button
+                    Button(
+                        onClick = {
+                            val user = User(
+                                name = "",
+                                email = email,
+                                password = "",
+                                confirmPassword = "",
+                                profileImage = R.drawable.profile_image
+                            )
+
+                            navController.navigate("recoverSent")
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Text(
+                            "ENVIAR",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }
