@@ -1,7 +1,31 @@
 package com.example.powerfit.controller
 
+import com.example.powerfit.R
+import com.example.powerfit.model.Role
+import com.example.powerfit.model.User
+
 class LoginController {
-    fun onLoginSuccess() {
-        // Navegue para a próxima tela ou realize outra ação
+    fun authenticate(email: String, password: String): User? {
+        return when {
+            email == "narak@example.com" && password == "senha123" ->
+                User(
+                    name = "Narak",
+                    email = email,
+                    password = password,
+                    confirmPassword = password,
+                    profileImage = R.drawable.profile_icon,
+                    role = Role.USER
+                )
+            email == "prof@example.com" && password == "senhaProf" ->
+                User(
+                    name = "Professor X",
+                    email = email,
+                    password = password,
+                    confirmPassword = password,
+                    profileImage = R.drawable.profile_icon,
+                    role = Role.TEACHER
+                )
+            else -> null
+        }
     }
 }

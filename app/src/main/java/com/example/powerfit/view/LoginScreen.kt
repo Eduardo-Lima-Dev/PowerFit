@@ -49,12 +49,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.powerfit.model.User
 import com.example.powerfit.R
+import com.example.powerfit.controller.LoginController
+import com.example.powerfit.model.Role
 
 @Composable
 fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
+    val loginController = remember { LoginController() }
 
     Box(
         modifier = Modifier
@@ -182,13 +185,12 @@ fun LoginScreen(navController: NavController) {
                     // Login Button
                     Button(
                         onClick = {
-                            val user = User(
-                                name = "", email = email, password = password, confirmPassword = password, profileImage = 0
-                            )
-                            if (user.isValid() && email == "narak@example.com" && password == "senha123") {
-                                // Se as credenciais forem válidas, navegue para a HomeScreen
-                                navController.navigate("home") {
-                                    // Limpa a pilha de navegação para que o usuário não volte para a tela de login
+                            val user = loginController.authenticate(email, password)
+                            if (user != null && user.isValid()) {
+                                // Limpa stack e navega pra tela adequada
+                                navController.navigate(
+                                    if (user.role == Role.TEACHER) "teacherHome" else "home"
+                                ) {
                                     popUpTo("login") { inclusive = true }
                                 }
                             } else {

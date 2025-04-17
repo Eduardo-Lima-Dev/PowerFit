@@ -42,8 +42,6 @@ fun ExerciseSelectionScreenPreview() {
 
 @Composable
 fun ExerciseSelectionScreen(navController: NavController) {
-@Composable
-fun ExerciseSelectionScreen(navController: NavController) {
     val controller = remember { HomeController(navController) }
     val user = controller.getUser()
 
@@ -138,5 +136,4 @@ fun ExerciseSelectionScreen(navController: NavController) {
         // Menu Inferior de Navegação (com fundo escuro)
         BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
     }
-}
 }

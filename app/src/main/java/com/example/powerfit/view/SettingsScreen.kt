@@ -117,7 +117,7 @@ fun SettingsScreen(navController: NavController) {
 
             CustomNavigationButton(
                 text = "Chatbot",
-                navRoute = "chatbot",
+                navRoute = "chatBot",
                 navController = navController
             )
 

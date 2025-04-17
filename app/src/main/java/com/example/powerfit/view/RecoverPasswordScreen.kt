@@ -168,7 +168,8 @@ fun RecoverPasswordScreen(navController: NavController) {
                                 email = email,
                                 password = "",
                                 confirmPassword = "",
-                                profileImage = R.drawable.profile_image
+                                profileImage = R.drawable.profile_icon,
+                                role = null
                             )
 
                             navController.navigate("recoverSent")

@@ -1,4 +1,4 @@
-package com.example.powerfit.navigation
+package com.example.powerfit.view
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -11,9 +11,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.powerfit.components.BottomMenu
-import com.example.powerfit.view.ExerciseViewScreen
-import com.example.powerfit.view.HomeScreen
-import com.example.powerfit.view.SettingsScreen
 
 @Composable
 fun MainScreen() {

@@ -1,5 +1,6 @@
 package com.example.powerfit.view
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -92,18 +93,27 @@ fun ExerciseViewScreen(
     }
 
     // ExoPlayer for YouTube video
-    val exoPlayer = remember {
-        ExoPlayer.Builder(context).build().apply {
-            val mediaItem = MediaItem.fromUri("https://youtu.be/${exercise.videoUrl}")
-            setMediaItem(mediaItem)
-            prepare()
+    var exoPlayer by remember { mutableStateOf<ExoPlayer?>(null) }
+
+    // Initialize ExoPlayer in a LaunchedEffect
+    LaunchedEffect(exercise.videoUrl) {
+        try {
+            val player = ExoPlayer.Builder(context).build()
+            // Corrigir o formato da URL do YouTube
+            val videoUrl = "https://www.youtube.com/watch?v=${exercise.videoUrl}"
+            val mediaItem = MediaItem.fromUri(videoUrl)
+            player.setMediaItem(mediaItem)
+            player.prepare()
+            exoPlayer = player
+        } catch (e: Exception) {
+            Log.e("ExerciseViewScreen", "Erro ao inicializar o player: ${e.message}")
         }
     }
 
     // Clean up ExoPlayer when leaving the screen
     DisposableEffect(Unit) {
         onDispose {
-            exoPlayer.release()
+            exoPlayer?.release()
         }
     }
 
@@ -165,14 +175,32 @@ fun ExerciseViewScreen(
                     .clip(RoundedCornerShape(16.dp)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                AndroidView(
-                    factory = { ctx ->
-                        StyledPlayerView(ctx).apply {
-                            player = exoPlayer
-                        }
-                    },
-                    modifier = Modifier.fillMaxSize()
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black)
+                ) {
+                    exoPlayer?.let { player ->
+                        AndroidView(
+                            factory = { ctx ->
+                                StyledPlayerView(ctx).apply {
+                                    this.player = player
+                                }
+                            },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } ?: run {
+                        // Mostrar um indicador de carregamento ou mensagem
+                        Text(
+                            text = "Carregando vídeo...",
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .padding(16.dp)
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
