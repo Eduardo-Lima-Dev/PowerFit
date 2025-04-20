@@ -18,7 +18,7 @@ class LoginController {
                 )
             email == "prof@example.com" && password == "senhaProf" ->
                 User(
-                    name = "Professor X",
+                    name = "Braga",
                     email = email,
                     password = password,
                     confirmPassword = password,
