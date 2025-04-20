@@ -8,9 +8,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.powerfit.controller.ExerciseViewModel
 import com.example.powerfit.controller.RegistrationController
 import com.example.powerfit.ui.theme.PowerFitTheme
 import com.example.powerfit.view.AssessmentsScreen
@@ -18,6 +22,7 @@ import com.example.powerfit.view.ChangeEmailScreen
 import com.example.powerfit.view.ChangePasswordScreen
 import com.example.powerfit.view.ChartScreen
 import com.example.powerfit.view.ChatScreen
+import com.example.powerfit.view.ExerciseListScreen
 import com.example.powerfit.view.ExerciseSelectionScreen
 import com.example.powerfit.view.HomeScreen
 import com.example.powerfit.view.LoginScreen
@@ -26,7 +31,7 @@ import com.example.powerfit.view.RecoverSentScreen
 import com.example.powerfit.view.RegistrationScreen
 import com.example.powerfit.view.ExerciseViewScreen
 import com.example.powerfit.view.SettingsScreen
-import com.example.powerfit.view.TeacherHomeScreen
+import com.example.powerfit.view.Teacher.TeacherHomeScreen
 import com.jakewharton.threetenabp.AndroidThreeTen
 
 class MainActivity : ComponentActivity() {
@@ -34,13 +39,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         AndroidThreeTen.init(this)
         setContent {
+            val sharedViewModel: ExerciseViewModel = viewModel(viewModelStoreOwner = this)
             PowerFitTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    SetupNavHost()
-
+                    SetupNavHost(sharedViewModel)
                 }
             }
         }
@@ -48,7 +53,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun SetupNavHost() {
+fun SetupNavHost(sharedViewModel: ExerciseViewModel) {
     val navController = rememberNavController() // Criando o NavController aqui
 
     NavHost(navController = navController, startDestination = "home") {
@@ -86,6 +91,23 @@ fun SetupNavHost() {
         composable("exerciseView") {
             // Passando o navController para ExerciseViewScreen
             ExerciseViewScreen(navController = navController)
+        }
+        // Rota para lista de exercícios por ID
+        composable(
+            route = "exerciseView/{exerciseId}",
+            arguments = listOf(navArgument("exerciseId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val exerciseId = backStackEntry.arguments?.getString("exerciseId") ?: ""
+            ExerciseViewScreen(navController = navController, exerciseId = exerciseId)
+        }
+        // Rota para lista de exercícios por categoria
+        composable(
+            route = "exerciseList/{category}",
+            arguments = listOf(navArgument("category") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val category = backStackEntry.arguments?.getString("category") ?: ""
+            // Passando o sharedViewModel para o ExerciseListScreen
+            ExerciseListScreen(navController = navController, category = category, viewModel = sharedViewModel)
         }
         composable("settings") {
             SettingsScreen(navController = navController)

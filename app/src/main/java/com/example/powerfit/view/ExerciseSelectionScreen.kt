@@ -107,7 +107,7 @@ fun ExerciseSelectionScreen(navController: NavController) {
             ) {
                 CustomNavigationButton(
                     text = "Superior",
-                    navRoute = "exerciseView",
+                    navRoute = "exerciseList/Superior", // Nova rota com parâmetro
                     navController = navController,
                     paddingTop = 50.dp,
                     icon = R.drawable.superior_icon,
@@ -116,7 +116,7 @@ fun ExerciseSelectionScreen(navController: NavController) {
 
                 CustomNavigationButton(
                     text = "Costas",
-                    navRoute = "exerciseView",
+                    navRoute = "exerciseList/Costas", // Nova rota com parâmetro
                     navController = navController,
                     paddingTop = 30.dp,
                     icon = R.drawable.back_icon,
@@ -125,7 +125,7 @@ fun ExerciseSelectionScreen(navController: NavController) {
 
                 CustomNavigationButton(
                     text = "Inferior",
-                    navRoute = "exerciseView",
+                    navRoute = "exerciseList/Inferior", // Nova rota com parâmetro
                     navController = navController,
                     paddingTop = 30.dp,
                     icon = R.drawable.inferior_icon,

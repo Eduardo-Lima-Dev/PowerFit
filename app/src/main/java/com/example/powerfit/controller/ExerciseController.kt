@@ -5,43 +5,85 @@ import com.example.powerfit.model.Exercise
 import com.example.powerfit.model.ExerciseSet
 
 class ExerciseController(private val navController: NavController) {
-
-    // Mock data for exercises
-    private val exercises = listOf(
-        Exercise(
-            id = "1",
-            name = "Rosca Direta",
-            videoUrl = "Q8TqfD8E7BU?si=3zw2jbz3kIJlYC8s",  // Remover https://youtu.be/
-            sets = listOf(
-                ExerciseSet(sets = 3, reps = 10)
+    private val allExercises = listOf(
+        "Superior" to listOf(
+            Exercise(
+                id = "1",
+                name = "Rosca Direta",
+                category = "Superior",
+                videoUrl = "Q8TqfD8E7BU",
+                sets = listOf(ExerciseSet(sets = 3, reps = 10)),
+                description = "Rosca Direta é um exercício que trabalha os músculos do bíceps..."
             ),
-            description = "Exercício para bíceps com barra reta"
+            Exercise(
+                id = "2",
+                name = "Elevacao Lateral",
+                videoUrl = "video_id_2",
+                category = "Superior",
+                sets = listOf(ExerciseSet(sets = 3, reps = 12)),
+                description = "Elevação Lateral é um exercício que trabalha os músculos dos ombros..."
+            ),
+            Exercise(
+                id = "3",
+                name = "Rosca Martelo",
+                category = "Superior",
+                videoUrl = "video_id_3",
+                sets = listOf(ExerciseSet(sets = 3, reps = 10)),
+                description = "Rosca Martelo é um exercício de musculação que foca no bíceps e antebraço..."
+            )
         ),
-        Exercise(
-            id = "2",
-            name = "Agachamento",
-            videoUrl = "aclHkVaku9U",  // Remover https://www.youtube.com/watch?v=
-            sets = listOf(
-                ExerciseSet(sets = 4, reps = 12)
+        "Costas" to listOf(
+            Exercise(
+                id = "4",
+                name = "Remada Curva",
+                category = "Costas",
+                videoUrl = "video_id_4",
+                sets = listOf(ExerciseSet(sets = 3, reps = 10)),
+                description = "Remada Curva é um exercício que trabalha os músculos das costas..."
             ),
-            description = "Exercício para pernas"
+            Exercise(
+                id = "5",
+                name = "Flexao de Ombro",
+                category = "Costas",
+                videoUrl = "video_id_5",
+                sets = listOf(ExerciseSet(sets = 3, reps = 15)),
+                description = "Flexão de Ombro é um exercício que trabalha os músculos do ombro e parte superior das costas..."
+            )
         ),
-        Exercise(
-            id = "3",
-            name = "Supino Reto",
-            videoUrl = "vthMCtgVtFw",  // Remover https://www.youtube.com/watch?v=
-            sets = listOf(
-                ExerciseSet(sets = 3, reps = 8)
+        "Peito" to listOf(
+            Exercise(
+                id = "6",
+                name = "Supino Reto",
+                category = "Peito",
+                videoUrl = "video_id_6",
+                sets = listOf(ExerciseSet(sets = 3, reps = 10)),
+                description = "Supino Reto é um exercício de musculação que foca no peitoral..."
             ),
-            description = "Exercício para peitoral"
-        )
+            Exercise(
+                id = "7",
+                name = "Supino Inclinado",
+                category = "Peito",
+                videoUrl = "video_id_7",
+                sets = listOf(ExerciseSet(sets = 3, reps = 12)),
+                description = "Supino Inclinado é um exercício de musculação que foca no peitoral superior..."
+            )
+        ),
+        "Inferior" to listOf(
+            Exercise(
+                id = "8",
+                name = "Agachamento",
+                category = "Inferior",
+                videoUrl = "video_id_8",
+                sets = listOf(ExerciseSet(sets = 3, reps = 12)),
+                description = "Agachamento é um exercício que trabalha principalmente os músculos das pernas..."
+            ),
+        ),
     )
+    private val exerciseMap = allExercises.flatMap { it.second }.associateBy { it.id }
 
-    fun getExerciseById(id: String): Exercise {
-        return exercises.find { it.id == id } ?: exercises[0]
+    fun getExerciseById(id: String): Exercise? {
+        return exerciseMap[id]
     }
 
-    fun getAllExercises(): List<Exercise> {
-        return exercises
-    }
+    fun getExercisesByCategory(category: String) = allExercises.flatMap { it.second }.filter { it.category == category }
 }

@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.powerfit.components.BottomMenu
 import com.example.powerfit.controller.ExerciseController
 import com.example.powerfit.model.ExerciseSet
 import com.google.android.exoplayer2.ExoPlayer
@@ -59,7 +60,7 @@ import kotlinx.coroutines.delay
 fun PreviewExerciseViewScreen() {
     ExerciseViewScreen(
         navController = rememberNavController(),
-        exerciseId = "1"
+        exerciseId = String.toString()
     )
 }
 
@@ -96,17 +97,19 @@ fun ExerciseViewScreen(
     var exoPlayer by remember { mutableStateOf<ExoPlayer?>(null) }
 
     // Initialize ExoPlayer in a LaunchedEffect
-    LaunchedEffect(exercise.videoUrl) {
-        try {
-            val player = ExoPlayer.Builder(context).build()
-            // Corrigir o formato da URL do YouTube
-            val videoUrl = "https://www.youtube.com/watch?v=${exercise.videoUrl}"
-            val mediaItem = MediaItem.fromUri(videoUrl)
-            player.setMediaItem(mediaItem)
-            player.prepare()
-            exoPlayer = player
-        } catch (e: Exception) {
-            Log.e("ExerciseViewScreen", "Erro ao inicializar o player: ${e.message}")
+    if (exercise != null) {
+        LaunchedEffect(exercise.videoUrl) {
+            try {
+                val player = ExoPlayer.Builder(context).build()
+                // Corrigir o formato da URL do YouTube
+                val videoUrl = "https://www.youtube.com/watch?v=${exercise?.videoUrl}"
+                val mediaItem = MediaItem.fromUri(videoUrl)
+                player.setMediaItem(mediaItem)
+                player.prepare()
+                exoPlayer = player
+            } catch (e: Exception) {
+                Log.e("ExerciseViewScreen", "Erro ao inicializar o player: ${e.message}")
+            }
         }
     }
 
@@ -159,13 +162,15 @@ fun ExerciseViewScreen(
             )
 
             // Exercise Name
-            Text(
-                text = exercise.name,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
+            if (exercise != null) {
+                Text(
+                    text = exercise.name,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+            }
 
             // Video Player
             Card(
@@ -293,12 +298,15 @@ fun ExerciseViewScreen(
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    exercise.sets.forEach { set ->
-                        SetItem(set = set)
+                    if (exercise != null) {
+                        exercise.sets.forEach { set ->
+                            SetItem(set = set)
+                        }
                     }
                 }
             }
         }
+        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 

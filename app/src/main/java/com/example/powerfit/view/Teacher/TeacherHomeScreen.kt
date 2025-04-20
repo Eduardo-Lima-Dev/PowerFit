@@ -1,4 +1,4 @@
-package com.example.powerfit.view
+package com.example.powerfit.view.Teacher
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

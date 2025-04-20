@@ -3,6 +3,7 @@ package com.example.powerfit.model
 data class Exercise(
     val id: String,
     val name: String,
+    val category: String,
     val videoUrl: String,
     val sets: List<ExerciseSet>,
     val description: String
