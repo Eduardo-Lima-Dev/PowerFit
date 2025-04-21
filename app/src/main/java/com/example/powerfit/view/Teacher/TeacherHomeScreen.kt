@@ -3,28 +3,14 @@ package com.example.powerfit.view.Teacher
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -35,15 +21,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.powerfit.R
 import com.example.powerfit.components.BottomMenu
 import com.example.powerfit.controller.HomeController
+import com.example.powerfit.model.StudentViewModel
 
 @Composable
 fun TeacherHomeScreen(navController: NavController) {
     val controller = remember { HomeController(navController) }
-    val user = controller.getUser()
+    val user = controller.getTeacher()
+
+    val viewModel: StudentViewModel = viewModel()
+    val vinculatedStudents = viewModel.vinculatedStudents
 
     Box(
         modifier = Modifier
@@ -88,7 +78,7 @@ fun TeacherHomeScreen(navController: NavController) {
                 )
 
                 IconButton(
-                    onClick = { /* Ação para adicionar aluno */ },
+                    onClick = { navController.navigate("studentBinding") },
                     modifier = Modifier.padding(start = 8.dp)
                 ) {
                     Icon(
@@ -114,14 +104,13 @@ fun TeacherHomeScreen(navController: NavController) {
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                // Lista de alunos fictícios
-                val studentsList = listOf("Carlos Silva", "Maria Oliveira", "João Santos", "Ana Souza")
-
                 LazyColumn {
-                    items(studentsList) { studentName ->
+                    items(vinculatedStudents) { student ->
                         StudentCard(
-                            name = studentName,
-                            onClick = { /* Navegar para detalhes do aluno */ }
+                            name = student.name,
+                            onClick = {
+                                // Futuro: navegar para detalhes do aluno
+                            }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }

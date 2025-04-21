@@ -1,4 +1,4 @@
-package com.example.powerfit.view
+package com.example.powerfit.view.Student
 
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
