@@ -31,6 +31,9 @@ import com.example.powerfit.view.RecoverSentScreen
 import com.example.powerfit.view.RegistrationScreen
 import com.example.powerfit.view.Student.ExerciseViewScreen
 import com.example.powerfit.view.SettingsScreen
+import com.example.powerfit.view.Teacher.EditExerciseScreen
+import com.example.powerfit.view.Teacher.EditStudentScreen
+import com.example.powerfit.view.Teacher.EditWorkoutsScreen
 import com.example.powerfit.view.Teacher.StudentBindingScreen
 import com.example.powerfit.view.Teacher.TeacherHomeScreen
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -109,6 +112,53 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel) {
             val category = backStackEntry.arguments?.getString("category") ?: ""
             // Passando o sharedViewModel para o ExerciseListScreen
             ExerciseListScreen(navController = navController, category = category, viewModel = sharedViewModel)
+        }
+        composable("editStudent/{studentId}") { backStackEntry ->
+            val studentId = backStackEntry.arguments?.getString("studentId")?.toIntOrNull() ?: 0
+            EditStudentScreen(
+                navController = navController,
+                studentId = studentId
+            )
+        }
+        composable("editWorkouts/{studentId}") { backStackEntry ->
+            val studentId = backStackEntry.arguments?.getString("studentId")?.toIntOrNull() ?: 0
+            EditWorkoutsScreen(
+                navController = navController,
+                studentId = studentId
+            )
+        }
+        // Para editar exercício existente
+        composable(
+            route = "editExercise/{studentId}/{exerciseId}",
+            arguments = listOf(
+                navArgument("studentId") { type = NavType.IntType },
+                navArgument("exerciseId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val studentId = backStackEntry.arguments?.getInt("studentId") ?: 0
+            val exerciseId = backStackEntry.arguments?.getString("exerciseId")
+            EditExerciseScreen(
+                navController = navController,
+                studentId = studentId,
+                category = sharedViewModel.getExerciseById(exerciseId ?: "")?.category ?: "",
+                exerciseId = exerciseId
+            )
+        }
+        // Para adicionar novo exercício
+        composable(
+            route = "addExercise/{studentId}/{category}",
+            arguments = listOf(
+                navArgument("studentId") { type = NavType.IntType },
+                navArgument("category") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val studentId = backStackEntry.arguments?.getInt("studentId") ?: 0
+            val category = backStackEntry.arguments?.getString("category") ?: ""
+            EditExerciseScreen(
+                navController = navController,
+                studentId = studentId,
+                category = category
+            )
         }
         composable("settings") {
             SettingsScreen(navController = navController)

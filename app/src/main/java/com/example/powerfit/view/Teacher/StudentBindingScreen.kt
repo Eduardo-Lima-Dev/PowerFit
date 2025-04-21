@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -31,6 +32,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -98,6 +100,17 @@ fun StudentBindingScreen(navController: NavHostController) {
                 )
             )
     ) {
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBack,
+                contentDescription = "Voltar"
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -187,15 +200,24 @@ fun StudentBindingScreen(navController: NavHostController) {
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Já treina?")
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Row {
-                            RadioButton(selected = trains, onClick = { trains = true })
-                            Text("Sim")
-                            Spacer(modifier = Modifier.width(8.dp))
-                            RadioButton(selected = !trains, onClick = { trains = false })
+                        Text("Já treina?", modifier = Modifier.weight(1f))
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = trains,
+                                onClick = { trains = true }
+                            )
+                            Text("Sim", modifier = Modifier.padding(end = 8.dp))
+                        }
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = !trains,
+                                onClick = { trains = false }
+                            )
                             Text("Não")
                         }
                     }
@@ -204,15 +226,24 @@ fun StudentBindingScreen(navController: NavHostController) {
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Comorbidade?")
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Row {
-                            RadioButton(selected = comorbidity, onClick = { comorbidity = true })
-                            Text("Sim")
-                            Spacer(modifier = Modifier.width(8.dp))
-                            RadioButton(selected = !comorbidity, onClick = { comorbidity = false })
+                        Text("Comorbidade?", modifier = Modifier.weight(1f))
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = comorbidity,
+                                onClick = { comorbidity = true }
+                            )
+                            Text("Sim", modifier = Modifier.padding(end = 8.dp))
+                        }
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = !comorbidity,
+                                onClick = { comorbidity = false }
+                            )
                             Text("Não")
                         }
                     }

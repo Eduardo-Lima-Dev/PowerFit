@@ -108,9 +108,7 @@ fun TeacherHomeScreen(navController: NavController) {
                     items(vinculatedStudents) { student ->
                         StudentCard(
                             name = student.name,
-                            onClick = {
-                                // Futuro: navegar para detalhes do aluno
-                            }
+                            onClick = { navController.navigate("editStudent/${student.id}") }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
