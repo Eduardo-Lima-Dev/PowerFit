@@ -1,4 +1,4 @@
-package com.example.powerfit.view
+package com.example.powerfit.view.Student
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

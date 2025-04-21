@@ -15,5 +15,16 @@ class HomeController(navController: NavController) {
         role = Role.USER
     )
 
+    private val teacher = User(
+        name = "Braga",
+        email = "prof@example.com",
+        password = "senhaProf",
+        confirmPassword = "senhaProf",
+        profileImage = R.drawable.profile_icon,
+        role = Role.TEACHER
+    )
+
+    fun getTeacher() = teacher
+
     fun getUser() = user
 }
