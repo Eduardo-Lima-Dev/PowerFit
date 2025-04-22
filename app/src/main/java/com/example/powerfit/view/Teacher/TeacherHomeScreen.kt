@@ -23,14 +23,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.powerfit.components.BottomMenu
-import com.example.powerfit.controller.HomeController
+import com.example.powerfit.ui.theme.BottomMenu
+import com.example.powerfit.model.MockAuth
 import com.example.powerfit.model.StudentViewModel
 
 @Composable
 fun TeacherHomeScreen(navController: NavController) {
-    val controller = remember { HomeController(navController) }
-    val user = controller.getTeacher()
+    // Redirecionar para login caso não esteja logado
+    if (!MockAuth.isLoggedIn()) {
+        navController.navigate("login") {
+            popUpTo(0) // Limpa toda a pilha de navegação
+        }
+    }
+
+    val user = MockAuth.currentUser
 
     val viewModel: StudentViewModel = viewModel()
     val vinculatedStudents = viewModel.vinculatedStudents
@@ -56,7 +62,7 @@ fun TeacherHomeScreen(navController: NavController) {
         ) {
             // Imagem de Perfil
             Image(
-                painter = painterResource(id = user.profileImage),
+                painter = painterResource(id = user!!.profileImage),
                 contentDescription = "Teacher Profile",
                 modifier = Modifier
                     .size(120.dp)

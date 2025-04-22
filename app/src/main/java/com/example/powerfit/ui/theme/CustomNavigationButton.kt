@@ -15,8 +15,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
-;
-
 @Composable
 fun CustomNavigationButton(
     text: String,
@@ -25,11 +23,19 @@ fun CustomNavigationButton(
     paddingTop: Dp = 0.dp,
     icon: Int? = null,
     iconSize: Dp = 24.dp,
-    clickable: Boolean = true
+    clickable: Boolean = true,
+    onBeforeNav: () -> Unit = {},
+    onAfterNav: () -> Unit = {}
 ) {
     Button(
 
-        onClick = { if (clickable) {navController.navigate(navRoute)} else null },
+        onClick = {
+            if (clickable) {
+                onBeforeNav()
+                navController.navigate(navRoute)
+                onAfterNav()
+            }
+        },
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = paddingTop)
@@ -44,8 +50,4 @@ fun CustomNavigationButton(
         }
         Text(text = text)
     }
-}
-
-enum class IconPosition {
-    Start, End
 }

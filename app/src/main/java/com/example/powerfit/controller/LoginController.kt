@@ -9,6 +9,7 @@ class LoginController {
         return when {
             email == "narak@example.com" && password == "senha123" ->
                 User(
+                    id = 2,
                     name = "Narak",
                     email = email,
                     password = password,
@@ -18,6 +19,7 @@ class LoginController {
                 )
             email == "prof@example.com" && password == "senhaProf" ->
                 User(
+                    id = 3,
                     name = "Braga",
                     email = email,
                     password = password,

@@ -15,10 +15,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.powerfit.components.BottomMenu
+import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.controller.ExerciseController
 import com.example.powerfit.model.Exercise
 import com.example.powerfit.model.ExerciseSet
+import com.example.powerfit.model.MockAuth
 import com.example.powerfit.model.Student
 import com.example.powerfit.model.StudentViewModel
 
@@ -30,6 +31,13 @@ fun EditExerciseScreen(
     category: String,
     exerciseId: String? = null
 ) {
+    // Redirecionar para login caso não esteja logado
+    if (!MockAuth.isLoggedIn()) {
+        navController.navigate("login") {
+            popUpTo(0) // Limpa toda a pilha de navegação
+        }
+    }
+
     val viewModel: StudentViewModel = viewModel()
     val student by remember { derivedStateOf {
         viewModel.vinculatedStudents.find { it.id == studentId } ?: Student(

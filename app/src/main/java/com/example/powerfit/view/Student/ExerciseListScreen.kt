@@ -38,11 +38,12 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.powerfit.components.BottomMenu
+import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.controller.ExerciseController
 import com.example.powerfit.controller.ExerciseViewModel
 import com.example.powerfit.controller.HomeController
 import com.example.powerfit.model.Exercise
+import com.example.powerfit.model.MockAuth
 
 @Composable
 fun ExerciseListScreen(
@@ -50,6 +51,13 @@ fun ExerciseListScreen(
     category: String,
     viewModel: ExerciseViewModel
 ) {
+    // Redirecionar para login caso não esteja logado
+    if (!MockAuth.isLoggedIn()) {
+        navController.navigate("login") {
+            popUpTo(0) // Limpa toda a pilha de navegação
+        }
+    }
+
     val controller = remember { ExerciseController(navController) }
     val homeController = remember { HomeController(navController) }
     val user = homeController.getUser()

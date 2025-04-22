@@ -163,15 +163,6 @@ fun RecoverPasswordScreen(navController: NavController) {
                     // Send Button
                     Button(
                         onClick = {
-                            val user = User(
-                                name = "",
-                                email = email,
-                                password = "",
-                                confirmPassword = "",
-                                profileImage = R.drawable.profile_icon,
-                                role = null
-                            )
-
                             navController.navigate("recoverSent")
                         },
                         modifier = Modifier

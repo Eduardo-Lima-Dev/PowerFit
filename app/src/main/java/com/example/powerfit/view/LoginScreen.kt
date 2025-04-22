@@ -29,6 +29,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,9 +48,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.powerfit.model.User
+import com.example.powerfit.model.MockAuth
 import com.example.powerfit.R
-import com.example.powerfit.controller.LoginController
 import com.example.powerfit.model.Role
 
 @Composable
@@ -57,7 +57,11 @@ fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
-    val loginController = remember { LoginController() }
+
+    LaunchedEffect(Unit) {
+        navController.popBackStack("login", inclusive = false)
+        MockAuth.logout()
+    }
 
     Box(
         modifier = Modifier
@@ -185,11 +189,11 @@ fun LoginScreen(navController: NavController) {
                     // Login Button
                     Button(
                         onClick = {
-                            val user = loginController.authenticate(email, password)
-                            if (user != null && user.isValid()) {
+                            val user = MockAuth.login(email, password)
+                            if (user) {
                                 // Limpa stack e navega pra tela adequada
                                 navController.navigate(
-                                    if (user.role == Role.TEACHER) "teacherHome" else "home"
+                                    if (MockAuth.isTeacher()) "teacherHome" else "home"
                                 ) {
                                     popUpTo("login") { inclusive = true }
                                 }

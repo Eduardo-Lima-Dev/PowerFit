@@ -47,9 +47,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.powerfit.components.BottomMenu
+import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.controller.ExerciseController
 import com.example.powerfit.model.ExerciseSet
+import com.example.powerfit.model.MockAuth
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
@@ -69,6 +70,13 @@ fun ExerciseViewScreen(
     navController: NavController,
     exerciseId: String = "1"
 ) {
+    // Redirecionar para login caso não esteja logado
+    if (!MockAuth.isLoggedIn()) {
+        navController.navigate("login") {
+            popUpTo(0) // Limpa toda a pilha de navegação
+        }
+    }
+
     val controller = remember { ExerciseController(navController) }
     val exercise = controller.getExerciseById(exerciseId)
     val context = LocalContext.current

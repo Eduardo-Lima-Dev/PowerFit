@@ -51,9 +51,17 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.powerfit.model.User
 import com.example.powerfit.R
+import com.example.powerfit.model.MockAuth
 
 @Composable
 fun ChangePasswordScreen(navController: NavController) {
+    // Redirecionar para login caso não esteja logado
+    if (!MockAuth.isLoggedIn()) {
+        navController.navigate("login") {
+            popUpTo(0) // Limpa toda a pilha de navegação
+        }
+    }
+
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 

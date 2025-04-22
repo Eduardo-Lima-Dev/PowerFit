@@ -64,11 +64,19 @@ import androidx.navigation.compose.rememberNavController
 import com.example.powerfit.controller.RegistrationController
 import com.example.powerfit.model.User
 import com.example.powerfit.R
+import com.example.powerfit.model.MockAuth
 import com.example.powerfit.model.StudentViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentBindingScreen(navController: NavHostController) {
+    // Redirecionar para login caso não esteja logado
+    if (!MockAuth.isLoggedIn()) {
+        navController.navigate("login") {
+            popUpTo(0) // Limpa toda a pilha de navegação
+        }
+    }
+
     val viewModel: StudentViewModel = viewModel()
     val students = viewModel.registeredStudents
 
