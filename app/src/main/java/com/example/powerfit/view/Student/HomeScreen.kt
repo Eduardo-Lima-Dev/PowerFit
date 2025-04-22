@@ -25,13 +25,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.powerfit.R
-import com.example.powerfit.components.BottomMenu
-import com.example.powerfit.controller.HomeController
+import com.example.powerfit.ui.theme.BottomMenu
+import com.example.powerfit.model.MockAuth
 import com.example.powerfit.ui.theme.CustomNavigationButton
 
 @Composable
 fun HomeScreen(navController: NavController) {
-    val user = remember { HomeController(navController).getUser() }
+    // Redirecionar para login caso não esteja logado
+    if (!MockAuth.isLoggedIn()) {
+        navController.navigate("login") {
+            popUpTo(0) // Limpa toda a pilha de navegação
+        }
+    }
+
+    val user = remember { MockAuth.currentUser }
 
     Box(
         modifier = Modifier
@@ -54,7 +61,7 @@ fun HomeScreen(navController: NavController) {
         ) {
             // Imagem de Perfil
             Image(
-                painter = painterResource(id = user.profileImage),
+                painter = painterResource(id = user!!.profileImage),
                 contentDescription = "User Profile",
                 modifier = Modifier
                     .size(120.dp)

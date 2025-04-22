@@ -19,7 +19,8 @@ import androidx.navigation.NavController
 import com.example.powerfit.controller.ChartController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.example.powerfit.components.BottomMenu
+import com.example.powerfit.ui.theme.BottomMenu
+import com.example.powerfit.model.MockAuth
 
 @Preview(showBackground = true)
 @Composable
@@ -30,6 +31,13 @@ fun PreviewChartScreen() {
 
 @Composable
 fun ChartScreen(navController: NavController) {
+    // Redirecionar para login caso não esteja logado
+    if (!MockAuth.isLoggedIn()) {
+        navController.navigate("login") {
+            popUpTo(0) // Limpa toda a pilha de navegação
+        }
+    }
+
     val chartController = ChartController()
     val chartData = chartController.getChartData()
 

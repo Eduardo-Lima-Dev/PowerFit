@@ -10,7 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.powerfit.components.BottomMenu
+import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.view.SettingsScreen
 
 @Composable

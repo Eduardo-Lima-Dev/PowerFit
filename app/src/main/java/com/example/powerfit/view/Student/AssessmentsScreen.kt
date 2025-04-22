@@ -30,7 +30,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.powerfit.R
-import com.example.powerfit.components.BottomMenu
+import com.example.powerfit.ui.theme.BottomMenu
+import com.example.powerfit.model.MockAuth
 import com.example.powerfit.ui.theme.CustomNavigationButton
 
 @Preview(showBackground = true)
@@ -41,6 +42,13 @@ fun AssessmentsScreenPreview() {
 
 @Composable
 fun AssessmentsScreen(navController: NavController) {
+    // Redirecionar para login caso não esteja logado
+    if (!MockAuth.isLoggedIn()) {
+        navController.navigate("login") {
+            popUpTo(0) // Limpa toda a pilha de navegação
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()

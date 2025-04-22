@@ -19,11 +19,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.powerfit.components.BottomMenu
+import com.example.powerfit.ui.theme.BottomMenu
+import com.example.powerfit.model.MockAuth
 import com.example.powerfit.ui.theme.ChatBubble
 
 @Composable
 fun ChatScreen(navController: NavController) {
+    // Redirecionar para login caso não esteja logado
+    if (!MockAuth.isLoggedIn()) {
+        navController.navigate("login") {
+            popUpTo(0) // Limpa toda a pilha de navegação
+        }
+    }
+
     // Classe para representar mensagens com origem
     data class ChatMessage(
         val content: String,

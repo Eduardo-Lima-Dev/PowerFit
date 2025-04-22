@@ -37,7 +37,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.powerfit.R
-import com.example.powerfit.components.BottomMenu
+import com.example.powerfit.ui.theme.BottomMenu
+import com.example.powerfit.model.MockAuth
+import com.example.powerfit.model.Role
 import com.example.powerfit.ui.theme.CustomNavigationButton
 
 @Preview(showBackground = true)
@@ -48,6 +50,13 @@ fun SettingsScreenPreview() {
 
 @Composable
 fun SettingsScreen(navController: NavController) {
+    // Redirecionar para login caso não esteja logado
+    if (!MockAuth.isLoggedIn()) {
+        navController.navigate("login") {
+            popUpTo(0) // Limpa toda a pilha de navegação
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -61,7 +70,13 @@ fun SettingsScreen(navController: NavController) {
             )
     ) {
         IconButton(
-            onClick = { navController.navigate("home") },
+            onClick = {
+                when (MockAuth.currentUser?.role) {
+                    Role.TEACHER -> { navController.navigate("teacherHome") }
+                    Role.USER -> { navController.navigate("home") }
+                    else -> { navController.navigate("login") }
+                }
+            },
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(8.dp)
@@ -93,7 +108,7 @@ fun SettingsScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Narak",
+                text = MockAuth.currentUser!!.name,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -102,7 +117,7 @@ fun SettingsScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "narak@example.com",
+                text = MockAuth.currentUser!!.email,
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -112,7 +127,8 @@ fun SettingsScreen(navController: NavController) {
             CustomNavigationButton(
                 text = "Alterar foto de perfil",
                 navRoute = "profilePhoto",
-                navController = navController
+                navController = navController,
+                clickable = false
             )
 
             CustomNavigationButton(
@@ -136,7 +152,10 @@ fun SettingsScreen(navController: NavController) {
             CustomNavigationButton(
                 text = "Sair",
                 navRoute = "login",
-                navController = navController
+                navController = navController,
+                onBeforeNav = {
+                    MockAuth.logout()
+                }
             )
         }
         BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))

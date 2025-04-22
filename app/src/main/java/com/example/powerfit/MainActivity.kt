@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
 fun SetupNavHost(sharedViewModel: ExerciseViewModel) {
     val navController = rememberNavController() // Criando o NavController aqui
 
-    NavHost(navController = navController, startDestination = "teacherHome") {
+    NavHost(navController = navController, startDestination = "login") {
         composable("login") {
             // Passando o navController para a tela de LoginScreen
             LoginScreen(navController = navController)
