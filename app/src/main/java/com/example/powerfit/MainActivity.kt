@@ -17,20 +17,21 @@ import androidx.navigation.navArgument
 import com.example.powerfit.controller.ExerciseViewModel
 import com.example.powerfit.controller.RegistrationController
 import com.example.powerfit.ui.theme.PowerFitTheme
-import com.example.powerfit.view.Student.AssessmentsScreen
 import com.example.powerfit.view.ChangeEmailScreen
 import com.example.powerfit.view.ChangePasswordScreen
-import com.example.powerfit.view.Student.ChartScreen
 import com.example.powerfit.view.ChatScreen
-import com.example.powerfit.view.Student.ExerciseListScreen
-import com.example.powerfit.view.Student.ExerciseSelectionScreen
-import com.example.powerfit.view.Student.HomeScreen
 import com.example.powerfit.view.LoginScreen
+import com.example.powerfit.view.ProfilePhotoScreen
 import com.example.powerfit.view.RecoverPasswordScreen
 import com.example.powerfit.view.RecoverSentScreen
 import com.example.powerfit.view.RegistrationScreen
-import com.example.powerfit.view.Student.ExerciseViewScreen
 import com.example.powerfit.view.SettingsScreen
+import com.example.powerfit.view.Student.AssessmentsScreen
+import com.example.powerfit.view.Student.ChartScreen
+import com.example.powerfit.view.Student.ExerciseListScreen
+import com.example.powerfit.view.Student.ExerciseSelectionScreen
+import com.example.powerfit.view.Student.ExerciseViewScreen
+import com.example.powerfit.view.Student.HomeScreen
 import com.example.powerfit.view.Teacher.EditExerciseScreen
 import com.example.powerfit.view.Teacher.EditStudentScreen
 import com.example.powerfit.view.Teacher.EditWorkoutsScreen
@@ -183,6 +184,9 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel) {
         }
         composable("studentBinding"){
             StudentBindingScreen(navController)
+        }
+        composable("profilePhoto") {
+            ProfilePhotoScreen(navController = navController)
         }
     }
 }

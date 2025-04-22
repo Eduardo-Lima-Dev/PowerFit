@@ -25,7 +25,7 @@ fun CustomNavigationButton(
     iconSize: Dp = 24.dp,
     clickable: Boolean = true,
     onBeforeNav: () -> Unit = {},
-    onAfterNav: () -> Unit = {}
+    onAfterNav: () -> Unit = {},
 ) {
     Button(
 
