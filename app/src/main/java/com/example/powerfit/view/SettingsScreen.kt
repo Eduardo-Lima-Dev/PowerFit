@@ -27,22 +27,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.powerfit.R
 import com.example.powerfit.model.MockAuth
 import com.example.powerfit.model.Role
+import com.example.powerfit.model.UserSessionViewModel
 import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.ui.theme.CustomNavigationButton
 
-@Preview(showBackground = true)
 @Composable
-fun SettingsScreenPreview() {
-    SettingsScreen(navController = rememberNavController())
-}
-
-@Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen(navController: NavController, viewModel: UserSessionViewModel) {
     // Redirecionar para login caso não esteja logado
     if (!MockAuth.isLoggedIn()) {
         navController.navigate("login") {

@@ -3,6 +3,7 @@ package com.example.powerfit
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -16,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.powerfit.controller.ExerciseViewModel
 import com.example.powerfit.controller.RegistrationController
+import com.example.powerfit.model.UserSessionViewModel
 import com.example.powerfit.ui.theme.PowerFitTheme
 import com.example.powerfit.view.ChangeEmailScreen
 import com.example.powerfit.view.ChangePasswordScreen
@@ -37,10 +39,13 @@ import com.example.powerfit.view.Teacher.EditStudentScreen
 import com.example.powerfit.view.Teacher.EditWorkoutsScreen
 import com.example.powerfit.view.Teacher.StudentBindingScreen
 import com.example.powerfit.view.Teacher.TeacherHomeScreen
+import com.google.firebase.FirebaseApp
 import com.jakewharton.threetenabp.AndroidThreeTen
 
 class MainActivity : ComponentActivity() {
+    private val userSessionViewModel: UserSessionViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
+        FirebaseApp.initializeApp(this)
         super.onCreate(savedInstanceState)
         AndroidThreeTen.init(this)
         setContent {
@@ -50,7 +55,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    SetupNavHost(sharedViewModel)
+                    SetupNavHost(sharedViewModel, userSessionViewModel)
                 }
             }
         }
@@ -58,25 +63,27 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun SetupNavHost(sharedViewModel: ExerciseViewModel) {
+fun SetupNavHost(sharedViewModel: ExerciseViewModel, userSessionViewModel: UserSessionViewModel) {
     val navController = rememberNavController() // Criando o NavController aqui
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
             // Passando o navController para a tela de LoginScreen
-            LoginScreen(navController = navController)
+            LoginScreen(navController = navController, userSessionViewModel)
         }
         composable("register") {
             // Passando o navController e controller de RegistrationController para RegistrationScreen
             RegistrationScreen(
                 navController = navController,
-                controller = RegistrationController()
+                controller = RegistrationController(),
+                userSessionViewModel
             )
         }
         composable("recover") {
             // Passando o navController para RecoverPasswordScreen
             RecoverPasswordScreen(
                 navController = navController,
+                userSessionViewModel
             )
         }
         composable("recoverSent") {
@@ -87,7 +94,7 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel) {
         }
         composable("home") {
             // Passando o navController para HomeScreen
-            HomeScreen(navController = navController)
+            HomeScreen(navController = navController, userSessionViewModel)
         }
         composable("exercises") {
             // Passando o navController para HomeScreen
@@ -162,7 +169,7 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel) {
             )
         }
         composable("settings") {
-            SettingsScreen(navController = navController)
+            SettingsScreen(navController = navController, userSessionViewModel)
         }
         composable("chart") {
             ChartScreen(navController = navController)
@@ -180,7 +187,7 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel) {
             ChatScreen(navController = navController)
         }
         composable("teacherHome"){
-            TeacherHomeScreen(navController)
+            TeacherHomeScreen(navController, userSessionViewModel)
         }
         composable("studentBinding"){
             StudentBindingScreen(navController)

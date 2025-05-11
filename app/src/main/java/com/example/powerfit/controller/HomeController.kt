@@ -7,22 +7,16 @@ import com.example.powerfit.model.Role
 
 class HomeController(navController: NavController) {
     private val user = User(
-        id = 100,
         name = "Narak",
         email = "narak@example.com",
-        password = "password123",
-        confirmPassword = "password123",
-        profileImage = R.drawable.profile_icon,
+        profileImage = "R.drawable.profile_icon",
         role = Role.USER
     )
 
     private val teacher = User(
-        id = 101,
         name = "Braga",
         email = "prof@example.com",
-        password = "senhaProf",
-        confirmPassword = "senhaProf",
-        profileImage = R.drawable.profile_icon,
+        profileImage = "R.drawable.profile_icon",
         role = Role.TEACHER
     )
 

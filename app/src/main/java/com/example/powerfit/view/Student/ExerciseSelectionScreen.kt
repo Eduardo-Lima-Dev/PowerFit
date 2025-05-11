@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.powerfit.R
 import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.controller.HomeController
@@ -95,15 +97,19 @@ fun ExerciseSelectionScreen(navController: NavController) {
             )
 
             // Imagem de Perfil
-            Image(
-                painter = painterResource(id = user.profileImage),
-                contentDescription = "User Profile",
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                    .padding(8.dp)
-            )
+            user?.let{
+                val painter = rememberAsyncImagePainter(model = it.profileImage)
+
+                Image(
+                    painter = painter,
+                    contentDescription = "User Profile",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                        .padding(8.dp)
+                )
+            }
 
             // Botões de Ação
             Column(

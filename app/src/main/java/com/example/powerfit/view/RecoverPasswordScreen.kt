@@ -43,12 +43,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.powerfit.R
-import com.example.powerfit.model.User
+import com.example.powerfit.model.UserSessionViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun RecoverPasswordScreen(navController: NavController) {
+fun RecoverPasswordScreen(navController: NavController, viewModel: UserSessionViewModel) {
     var email by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
@@ -163,7 +165,19 @@ fun RecoverPasswordScreen(navController: NavController) {
                     // Send Button
                     Button(
                         onClick = {
-                            navController.navigate("recoverSent")
+                            if (email != ""){
+                                FirebaseAuth.getInstance()
+                                    .sendPasswordResetEmail(email)
+                                    .addOnCompleteListener {
+                                        navController.navigate("recoverSent")
+                                    }
+                                    .addOnFailureListener{
+                                        navController.navigate("recoverSent")
+                                    }
+                            } else {
+                                errorMessage = "Preencha o campo!"
+                            }
+
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -184,13 +198,5 @@ fun RecoverPasswordScreen(navController: NavController) {
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewRecoverPasswordScreen() {
-    MaterialTheme {
-        RecoverPasswordScreen(navController = NavController(LocalContext.current))
     }
 }

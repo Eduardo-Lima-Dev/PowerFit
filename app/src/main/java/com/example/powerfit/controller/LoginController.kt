@@ -9,22 +9,16 @@ class LoginController {
         return when {
             email == "narak@example.com" && password == "senha123" ->
                 User(
-                    id = 2,
                     name = "Narak",
                     email = email,
-                    password = password,
-                    confirmPassword = password,
-                    profileImage = R.drawable.profile_icon,
+                    profileImage = "R.drawable.profile_icon",
                     role = Role.USER
                 )
             email == "prof@example.com" && password == "senhaProf" ->
                 User(
-                    id = 3,
                     name = "Braga",
                     email = email,
-                    password = password,
-                    confirmPassword = password,
-                    profileImage = R.drawable.profile_icon,
+                    profileImage = "R.drawable.profile_icon",
                     role = Role.TEACHER
                 )
             else -> null

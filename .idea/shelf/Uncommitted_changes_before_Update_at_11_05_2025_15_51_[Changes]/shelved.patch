@@ -1,0 +1,87 @@
+Index: app/src/main/java/com/example/powerfit/view/HomeScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.powerfit.view\r\n\r\nimport androidx.compose.foundation.Image\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.Box\r\nimport androidx.compose.foundation.layout.Column\r\nimport androidx.compose.foundation.layout.Row\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.foundation.layout.size\r\nimport androidx.compose.foundation.shape.CircleShape\r\nimport androidx.compose.material3.MaterialTheme\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.remember\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.draw.clip\r\nimport androidx.compose.ui.graphics.Brush\r\nimport androidx.compose.ui.res.painterResource\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport androidx.navigation.NavController\r\nimport com.example.powerfit.R\r\nimport com.example.powerfit.controller.HomeController\r\nimport com.example.powerfit.ui.theme.CustomNavigationButton\r\n\r\n@Composable\r\nfun HomeScreen(navController: NavController) {\r\n    val user = remember { HomeController(navController).getUser() }\r\n\r\n    Box(\r\n        modifier = Modifier\r\n            .fillMaxSize()\r\n            .background(\r\n                brush = Brush.verticalGradient(\r\n                    colors = listOf(\r\n                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),\r\n                        MaterialTheme.colorScheme.background\r\n                    )\r\n                )\r\n            )\r\n    ) {\r\n        Column(\r\n            modifier = Modifier\r\n                .fillMaxSize()\r\n                .padding(24.dp),\r\n            horizontalAlignment = Alignment.CenterHorizontally,\r\n            verticalArrangement = Arrangement.Top\r\n        ) {\r\n            // Imagem de Perfil\r\n            Image(\r\n                painter = painterResource(id = user.profileImage),\r\n                contentDescription = \"User Profile\",\r\n                modifier = Modifier\r\n                    .size(120.dp)\r\n                    .clip(CircleShape)\r\n                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))\r\n                    .padding(8.dp)\r\n            )\r\n\r\n            // Nome do Usuário\r\n            Text(\r\n                text = \"Olá, ${user.name}\",\r\n                fontSize = 24.sp,\r\n                fontWeight = FontWeight.Bold,\r\n                color = MaterialTheme.colorScheme.primary,\r\n                modifier = Modifier.padding(top = 16.dp)\r\n            )\r\n\r\n            // Dias da Semana\r\n            Row(\r\n                modifier = Modifier\r\n                    .fillMaxWidth()\r\n                    .padding(top = 16.dp),\r\n                horizontalArrangement = Arrangement.SpaceAround\r\n            ) {\r\n                val daysOfWeek = listOf(\"D\", \"S\", \"T\", \"Q\", \"Q\", \"S\", \"S\")\r\n\r\n                daysOfWeek.forEachIndexed { index, day ->\r\n                    Text(\r\n                        text = day,\r\n                        fontSize = 18.sp,\r\n                        fontWeight = FontWeight.Bold,\r\n                        color = if (index % 2 != 0) {\r\n                            MaterialTheme.colorScheme.primary\r\n                        } else {\r\n                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)\r\n                        }\r\n                    )\r\n                }\r\n            }\r\n\r\n            // Bolinhas abaixo dos dias da semana\r\n            Row(\r\n                modifier = Modifier\r\n                    .fillMaxWidth()\r\n                    .padding(top = 8.dp),\r\n                horizontalArrangement = Arrangement.SpaceAround\r\n            ) {\r\n                val daysOfWeek = listOf(\"D\", \"S\", \"T\", \"Q\", \"Q\", \"S\", \"S\")\r\n\r\n                daysOfWeek.forEachIndexed { index, _ ->\r\n                    Box(\r\n                        modifier = Modifier\r\n                            .size(8.dp)\r\n                            .clip(CircleShape)\r\n                            .background(\r\n                                color = if (index % 2 != 0) {\r\n                                    MaterialTheme.colorScheme.primary\r\n                                } else {\r\n                                    MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)\r\n                                }\r\n                            )\r\n                    )\r\n                }\r\n            }\r\n\r\n            // Botões de Ação\r\n            Column(\r\n                modifier = Modifier\r\n                    .fillMaxWidth()\r\n                    .padding(top = 32.dp),\r\n                horizontalAlignment = Alignment.CenterHorizontally,\r\n                verticalArrangement = Arrangement.spacedBy(12.dp)\r\n            ) {\r\n                CustomNavigationButton(\r\n                    text = \"Treinos\",\r\n                    navRoute = \"exercises\",\r\n                    navController = navController,\r\n                    paddingTop = 50.dp,\r\n                    icon = R.drawable.weight_icon,\r\n                    iconSize = 50.dp\r\n                )\r\n\r\n                CustomNavigationButton(\r\n                    text = \"Avaliações\",\r\n                    navRoute = \"assessments\",\r\n                    navController = navController,\r\n                    paddingTop = 30.dp,\r\n                    icon = R.drawable.assessment_icon,\r\n                    iconSize = 50.dp\r\n                )\r\n\r\n                CustomNavigationButton(\r\n                    text = \"Progresso\",\r\n                    navRoute = \"progress\",\r\n                    navController = navController,\r\n                    paddingTop = 30.dp,\r\n                    icon = R.drawable.progress_icon,\r\n                    iconSize = 50.dp\r\n                )\r\n            }\r\n        }\r\n    }\r\n}
+===================================================================
+diff --git a/app/src/main/java/com/example/powerfit/view/HomeScreen.kt b/app/src/main/java/com/example/powerfit/view/HomeScreen.kt
+--- a/app/src/main/java/com/example/powerfit/view/HomeScreen.kt	(revision 3a98423ab65d329bae1224035fc4d5985adeb011)
++++ b/app/src/main/java/com/example/powerfit/view/HomeScreen.kt	(date 1746989288205)
+@@ -14,6 +14,7 @@
+ import androidx.compose.material3.MaterialTheme
+ import androidx.compose.material3.Text
+ import androidx.compose.runtime.Composable
++import androidx.compose.runtime.LaunchedEffect
+ import androidx.compose.runtime.remember
+ import androidx.compose.ui.Alignment
+ import androidx.compose.ui.Modifier
+@@ -23,14 +24,24 @@
+ import androidx.compose.ui.text.font.FontWeight
+ import androidx.compose.ui.unit.dp
+ import androidx.compose.ui.unit.sp
++import androidx.lifecycle.viewmodel.compose.viewModel
+ import androidx.navigation.NavController
+ import com.example.powerfit.R
+ import com.example.powerfit.controller.HomeController
++import com.example.powerfit.model.UserSessionViewModel
+ import com.example.powerfit.ui.theme.CustomNavigationButton
++import androidx.compose.runtime.getValue
+ 
+ @Composable
+ fun HomeScreen(navController: NavController) {
+-    val user = remember { HomeController(navController).getUser() }
++    val viewModel: UserSessionViewModel = viewModel()
++    val user by viewModel.user
++
++    LaunchedEffect(Unit) {
++        if (user == null) {
++            viewModel.loadUser()
++        }
++    }
+ 
+     Box(
+         modifier = Modifier
+@@ -52,24 +63,28 @@
+             verticalArrangement = Arrangement.Top
+         ) {
+             // Imagem de Perfil
+-            Image(
+-                painter = painterResource(id = user.profileImage),
+-                contentDescription = "User Profile",
+-                modifier = Modifier
+-                    .size(120.dp)
+-                    .clip(CircleShape)
+-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+-                    .padding(8.dp)
+-            )
++            user?.let {
++                Image(
++                    painter = painterResource(id = it.profileImage),
++                    contentDescription = "User Profile",
++                    modifier = Modifier
++                        .size(120.dp)
++                        .clip(CircleShape)
++                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
++                        .padding(8.dp)
++                )
++            }
+ 
+             // Nome do Usuário
+-            Text(
+-                text = "Olá, ${user.name}",
+-                fontSize = 24.sp,
+-                fontWeight = FontWeight.Bold,
+-                color = MaterialTheme.colorScheme.primary,
+-                modifier = Modifier.padding(top = 16.dp)
+-            )
++            user?.let {
++                Text(
++                    text = "Olá, ${it.name}",
++                    fontSize = 24.sp,
++                    fontWeight = FontWeight.Bold,
++                    color = MaterialTheme.colorScheme.primary,
++                    modifier = Modifier.padding(top = 16.dp)
++                )
++            }
+ 
+             // Dias da Semana
+             Row(

@@ -15,12 +15,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.powerfit.model.MockAuth
 import com.example.powerfit.model.Role
+import com.example.powerfit.model.UserSessionViewModel
 
 @Composable
 fun BottomMenu(navController: NavController, modifier: Modifier = Modifier) {
+    val viewModel: UserSessionViewModel = viewModel()
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -30,9 +32,9 @@ fun BottomMenu(navController: NavController, modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = {
-            when (MockAuth.currentUser?.role) {
-                Role.TEACHER -> { navController.navigate("teacherHome") }
-                Role.USER -> { navController.navigate("home") }
+            when (viewModel.isTeacher()) {
+                true -> { navController.navigate("teacherHome") }
+                false -> { navController.navigate("home") }
                 else -> { navController.navigate("login") }
             }
         }) {

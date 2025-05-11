@@ -12,23 +12,23 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.model.MockAuth
 import com.example.powerfit.model.StudentViewModel
+import com.example.powerfit.model.UserSessionViewModel
 
 @Composable
-fun TeacherHomeScreen(navController: NavController) {
+fun TeacherHomeScreen(navController: NavController, viewModel: UserSessionViewModel) {
     // Redirecionar para login caso não esteja logado
     if (!MockAuth.isLoggedIn()) {
         navController.navigate("login") {
@@ -61,27 +61,33 @@ fun TeacherHomeScreen(navController: NavController) {
             verticalArrangement = Arrangement.Top
         ) {
             // Imagem de Perfil
-            Image(
-                painter = painterResource(id = user!!.profileImage),
-                contentDescription = "Teacher Profile",
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                    .padding(8.dp)
-            )
+            user?.let{
+                val painter = rememberAsyncImagePainter(model = it.profileImage)
+
+                Image(
+                    painter = painter,
+                    contentDescription = "User Profile",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                        .padding(8.dp)
+                )
+            }
 
             // Nome do Professor com botão adicionar
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                Text(
-                    text = "Olá, ${user.name}",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                user?.let{
+                    Text(
+                        text = "Olá, ${user.name}",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
 
                 IconButton(
                     onClick = { navController.navigate("studentBinding") },

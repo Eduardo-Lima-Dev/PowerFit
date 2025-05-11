@@ -1,5 +1,6 @@
 package com.example.powerfit.view
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -51,15 +52,21 @@ import androidx.navigation.compose.rememberNavController
 import com.example.powerfit.controller.RegistrationController
 import com.example.powerfit.model.User
 import com.example.powerfit.R
+import com.example.powerfit.model.Role
+import com.example.powerfit.model.UserSessionViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistrationScreen(navController: NavHostController, controller: RegistrationController) {
+fun RegistrationScreen(navController: NavHostController, controller: RegistrationController, viewModel: UserSessionViewModel) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
+
+    val auth = FirebaseAuth.getInstance()
+    val firestore = FirebaseFirestore.getInstance()
 
     Box(
         modifier = Modifier
@@ -239,11 +246,44 @@ fun RegistrationScreen(navController: NavHostController, controller: Registratio
                     // Register Button
                     Button(
                         onClick = {
-                            val user = User(55, name, email, password, confirmPassword, R.drawable.profile_icon, null)
-                            if (user.isValid()) {
-                                controller.onRegisterSuccess()
+                            if (email != "" && password != "" && password == confirmPassword) {
+                                auth.createUserWithEmailAndPassword(email, password)
+                                    .addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            val uid = auth.currentUser?.uid
+                                                ?: return@addOnCompleteListener
+
+                                            val imageDefault = "https://i.imgur.com/1j5hI8k.png"
+                                            val user = User(
+                                                name,
+                                                email,
+                                                imageDefault,
+                                                Role.USER
+                                            )
+
+                                            firestore.collection("usuarios")
+                                                .document(uid)
+                                                .set(user)
+                                                .addOnSuccessListener {
+                                                    Log.d("Firestore", "Usuário salvo com sucesso!")
+                                                    viewModel.loadUser()
+                                                    navController.navigate("home") {
+                                                        popUpTo("login") { inclusive = true }
+                                                    }
+
+                                                }
+                                                .addOnFailureListener {
+                                                    errorMessage = "Use um email válido e uma senha com pelo menos 8 dígitos!"
+                                                }
+                                        } else {
+                                            Log.e(
+                                                "Auth",
+                                                "Erro ao cadastrar: ${task.exception?.message}"
+                                            )
+                                        }
+                                    }
                             } else {
-                                errorMessage = "Credenciais inválidas"
+                                errorMessage = "Preencha os campos!"
                             }
                         },
                         modifier = Modifier
@@ -283,16 +323,5 @@ fun RegistrationScreen(navController: NavHostController, controller: Registratio
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun PreviewRegistrationScreen() {
-    MaterialTheme {
-        RegistrationScreen(
-            navController = rememberNavController(),
-            controller = RegistrationController()
-        )
     }
 }
