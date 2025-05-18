@@ -45,11 +45,11 @@ import com.jakewharton.threetenabp.AndroidThreeTen
 class MainActivity : ComponentActivity() {
     private val userSessionViewModel: UserSessionViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
-        FirebaseApp.initializeApp(this)
         super.onCreate(savedInstanceState)
-        AndroidThreeTen.init(this)
+        FirebaseApp.initializeApp(this)
+        AndroidThreeTen.init(applicationContext)
         setContent {
-            val sharedViewModel: ExerciseViewModel = viewModel(viewModelStoreOwner = this)
+            val sharedViewModel: ExerciseViewModel = viewModel()
             PowerFitTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -64,15 +64,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SetupNavHost(sharedViewModel: ExerciseViewModel, userSessionViewModel: UserSessionViewModel) {
-    val navController = rememberNavController() // Criando o NavController aqui
+    val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
-            // Passando o navController para a tela de LoginScreen
             LoginScreen(navController = navController, userSessionViewModel)
         }
         composable("register") {
-            // Passando o navController e controller de RegistrationController para RegistrationScreen
             RegistrationScreen(
                 navController = navController,
                 controller = RegistrationController(),
@@ -80,31 +78,25 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel, userSessionViewModel: UserS
             )
         }
         composable("recover") {
-            // Passando o navController para RecoverPasswordScreen
             RecoverPasswordScreen(
                 navController = navController,
                 userSessionViewModel
             )
         }
         composable("recoverSent") {
-            // Passando o navController para RecoverSentScreen
             RecoverSentScreen(
                 navController = navController,
             )
         }
         composable("home") {
-            // Passando o navController para HomeScreen
             HomeScreen(navController = navController, userSessionViewModel)
         }
         composable("exercises") {
-            // Passando o navController para HomeScreen
-            ExerciseSelectionScreen(navController = navController)
+            ExerciseSelectionScreen(navController = navController, viewModel = sharedViewModel)
         }
         composable("exerciseView") {
-            // Passando o navController para ExerciseViewScreen
             ExerciseViewScreen(navController = navController)
         }
-        // Rota para lista de exercícios por ID
         composable(
             route = "exerciseView/{exerciseId}",
             arguments = listOf(navArgument("exerciseId") { type = NavType.StringType })
@@ -112,13 +104,11 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel, userSessionViewModel: UserS
             val exerciseId = backStackEntry.arguments?.getString("exerciseId") ?: ""
             ExerciseViewScreen(navController = navController, exerciseId = exerciseId)
         }
-        // Rota para lista de exercícios por categoria
         composable(
             route = "exerciseList/{category}",
             arguments = listOf(navArgument("category") { type = NavType.StringType })
         ) { backStackEntry ->
             val category = backStackEntry.arguments?.getString("category") ?: ""
-            // Passando o sharedViewModel para o ExerciseListScreen
             ExerciseListScreen(navController = navController, category = category, viewModel = sharedViewModel)
         }
         composable("editStudent/{studentId}") { backStackEntry ->
@@ -135,7 +125,6 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel, userSessionViewModel: UserS
                 studentId = studentId
             )
         }
-        // Para editar exercício existente
         composable(
             route = "editExercise/{studentId}/{exerciseId}",
             arguments = listOf(
@@ -144,15 +133,14 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel, userSessionViewModel: UserS
             )
         ) { backStackEntry ->
             val studentId = backStackEntry.arguments?.getInt("studentId") ?: 0
-            val exerciseId = backStackEntry.arguments?.getString("exerciseId")
+            val exerciseId = backStackEntry.arguments?.getString("exerciseId") ?: ""
             EditExerciseScreen(
                 navController = navController,
                 studentId = studentId,
-                category = sharedViewModel.getExerciseById(exerciseId ?: "")?.category ?: "",
+                category = sharedViewModel.getExerciseById(exerciseId)?.category ?: "",
                 exerciseId = exerciseId
             )
         }
-        // Para adicionar novo exercício
         composable(
             route = "addExercise/{studentId}/{category}",
             arguments = listOf(
@@ -174,22 +162,22 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel, userSessionViewModel: UserS
         composable("chart") {
             ChartScreen(navController = navController)
         }
-        composable("assessments"){
+        composable("assessments") {
             AssessmentsScreen(navController = navController)
         }
-        composable("changeEmail"){
+        composable("changeEmail") {
             ChangeEmailScreen(navController = navController)
         }
-        composable("changePassword"){
+        composable("changePassword") {
             ChangePasswordScreen(navController = navController)
         }
-        composable ("chatBot"){
+        composable("chatBot") {
             ChatScreen(navController = navController)
         }
-        composable("teacherHome"){
+        composable("teacherHome") {
             TeacherHomeScreen(navController, userSessionViewModel)
         }
-        composable("studentBinding"){
+        composable("studentBinding") {
             StudentBindingScreen(navController)
         }
         composable("profilePhoto") {

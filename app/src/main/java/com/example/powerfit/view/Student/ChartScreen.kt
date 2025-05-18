@@ -45,7 +45,7 @@ fun ChartScreen(navController: NavController) {
         topBar = {
             TopAppBar(
                 title = { Text(text = "Dias Ativos por Exercícios") },
-                colors = TopAppBarDefaults.smallTopAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )

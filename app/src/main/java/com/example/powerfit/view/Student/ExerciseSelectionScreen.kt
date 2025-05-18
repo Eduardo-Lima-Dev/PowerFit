@@ -1,5 +1,6 @@
 package com.example.powerfit.view.Student
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,38 +23,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.powerfit.R
+import com.example.powerfit.controller.ExerciseViewModel
 import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.controller.HomeController
-import com.example.powerfit.model.MockAuth
 import com.example.powerfit.ui.theme.CustomNavigationButton
+import com.google.firebase.auth.FirebaseUser
 
-@Preview(showBackground = true)
+@SuppressLint("ViewModelConstructorInComposable")
 @Composable
-fun ExerciseSelectionScreenPreview() {
-    ExerciseSelectionScreen(navController = rememberNavController())
-}
+fun ExerciseSelectionScreen(navController: NavController, viewModel: ExerciseViewModel) {
+//    val user = viewModel.user.value
+    val user: MutableLiveData<FirebaseUser?> = MutableLiveData()
 
-@Composable
-fun ExerciseSelectionScreen(navController: NavController) {
-    // Redirecionar para login caso não esteja logado
-    if (!MockAuth.isLoggedIn()) {
+    // Verifica se o usuário está autenticado
+    if (user == null) {
         navController.navigate("login") {
             popUpTo(0) // Limpa toda a pilha de navegação
         }
+        return
     }
 
     val controller = remember { HomeController(navController) }
-    val user = controller.getUser()
 
     Box(
         modifier = Modifier
@@ -91,25 +88,24 @@ fun ExerciseSelectionScreen(navController: NavController) {
             Text(
                 text = "PowerFit",
                 fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(top = 16.dp, bottom = 32.dp)
             )
 
-            // Imagem de Perfil
-            user?.let{
-                val painter = rememberAsyncImagePainter(model = it.profileImage)
-
-                Image(
-                    painter = painter,
-                    contentDescription = "User Profile",
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                        .padding(8.dp)
-                )
-            }
+//            // Imagem de Perfil
+//            user.let{
+//                val painter = rememberAsyncImagePainter(it.profileImage)
+//
+//                Image(
+//                    painter = painter,
+//                    contentDescription = "User Profile",
+//                    modifier = Modifier
+//                        .size(120.dp)
+//                        .clip(CircleShape)
+//                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+//                        .padding(8.dp)
+//                )
+//            }
 
             // Botões de Ação
             Column(
@@ -121,7 +117,7 @@ fun ExerciseSelectionScreen(navController: NavController) {
             ) {
                 CustomNavigationButton(
                     text = "Superior",
-                    navRoute = "exerciseList/Superior", // Nova rota com parâmetro
+                    navRoute = "exerciseList/Superior",
                     navController = navController,
                     paddingTop = 50.dp,
                     icon = R.drawable.superior_icon,
@@ -130,7 +126,7 @@ fun ExerciseSelectionScreen(navController: NavController) {
 
                 CustomNavigationButton(
                     text = "Costas",
-                    navRoute = "exerciseList/Costas", // Nova rota com parâmetro
+                    navRoute = "exerciseList/Costas",
                     navController = navController,
                     paddingTop = 30.dp,
                     icon = R.drawable.back_icon,
@@ -139,7 +135,7 @@ fun ExerciseSelectionScreen(navController: NavController) {
 
                 CustomNavigationButton(
                     text = "Inferior",
-                    navRoute = "exerciseList/Inferior", // Nova rota com parâmetro
+                    navRoute = "exerciseList/Inferior",
                     navController = navController,
                     paddingTop = 30.dp,
                     icon = R.drawable.inferior_icon,
@@ -147,7 +143,7 @@ fun ExerciseSelectionScreen(navController: NavController) {
                 )
             }
         }
-        // Menu Inferior de Navegação (com fundo escuro)
+        // Menu Inferior de Navegação
         BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
