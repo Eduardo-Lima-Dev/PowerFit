@@ -1,17 +1,9 @@
 package com.example.powerfit.view.Student
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -20,54 +12,48 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.controller.ExerciseController
 import com.example.powerfit.controller.ExerciseViewModel
-import com.example.powerfit.controller.HomeController
 import com.example.powerfit.model.Exercise
-import com.example.powerfit.model.MockAuth
+import com.google.firebase.auth.FirebaseUser
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Composable
 fun ExerciseListScreen(
     navController: NavController,
     category: String,
     viewModel: ExerciseViewModel
 ) {
-    // Redirecionar para login caso não esteja logado
-    if (!MockAuth.isLoggedIn()) {
+    val user: MutableLiveData<FirebaseUser?> = MutableLiveData()
+
+    // Verifica se o usuário está autenticado
+    if (user == null) {
         navController.navigate("login") {
             popUpTo(0) // Limpa toda a pilha de navegação
         }
+        return
     }
 
     val controller = remember { ExerciseController(navController) }
-    val homeController = remember { HomeController(navController) }
-    val user = homeController.getUser()
 
-    val exercises = try {
-        controller.getExercisesByCategory(category)
-    } catch (e: Exception) {
-        emptyList<Exercise>()
+    // Obter exercícios do Firebase através do ViewModel
+    val exercises = remember(category) {
+        viewModel.exercisesByCategory(category)
     }
 
     Box(
@@ -111,19 +97,19 @@ fun ExerciseListScreen(
             )
 
             // Imagem de Perfil
-            user?.let{
-                val painter = rememberAsyncImagePainter(model = it.profileImage)
-
-                Image(
-                    painter = painter,
-                    contentDescription = "User Profile",
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                        .padding(8.dp)
-                )
-            }
+//            user.let { currentUser ->
+//                val painter = rememberAsyncImagePainter(model = currentUser.photoUrl?.toString())
+//
+//                Image(
+//                    painter = painter,
+//                    contentDescription = "User Profile",
+//                    modifier = Modifier
+//                        .size(120.dp)
+//                        .clip(CircleShape)
+//                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+//                        .padding(8.dp)
+//                )
+//            }
 
             // Título da categoria
             Text(
@@ -135,7 +121,16 @@ fun ExerciseListScreen(
 
             // Lista de exercícios
             if (exercises.isEmpty()) {
-                Text("Nenhum exercício encontrado para esta categoria")
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Nenhum exercício encontrado para esta categoria",
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
             } else {
                 LazyColumn {
                     items(exercises) { exercise ->
@@ -159,7 +154,6 @@ fun ExerciseCard(
     navController: NavController,
     viewModel: ExerciseViewModel
 ) {
-    // Use o estado do ViewModel em vez de um estado local
     val isCompleted = viewModel.isExerciseCompleted(exercise.id)
 
     Card(
@@ -173,7 +167,6 @@ fun ExerciseCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Conteúdo do exercício
             Column(
                 modifier = Modifier.weight(1f)
             ) {

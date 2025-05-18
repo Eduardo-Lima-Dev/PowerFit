@@ -95,14 +95,15 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel, userSessionViewModel: UserS
             ExerciseSelectionScreen(navController = navController, viewModel = sharedViewModel)
         }
         composable("exerciseView") {
-            ExerciseViewScreen(navController = navController)
+            val exerciseId = ""
+            ExerciseViewScreen(navController = navController, exerciseId = exerciseId, viewModel = sharedViewModel)
         }
         composable(
             route = "exerciseView/{exerciseId}",
             arguments = listOf(navArgument("exerciseId") { type = NavType.StringType })
         ) { backStackEntry ->
             val exerciseId = backStackEntry.arguments?.getString("exerciseId") ?: ""
-            ExerciseViewScreen(navController = navController, exerciseId = exerciseId)
+            ExerciseViewScreen(navController = navController, exerciseId = exerciseId, viewModel = sharedViewModel)
         }
         composable(
             route = "exerciseList/{category}",

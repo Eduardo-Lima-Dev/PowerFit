@@ -1,5 +1,6 @@
 package com.example.powerfit.view.Student
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -45,36 +46,45 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.controller.ExerciseController
+import com.example.powerfit.controller.ExerciseViewModel
 import com.example.powerfit.model.ExerciseSet
-import com.example.powerfit.model.MockAuth
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.delay
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 fun PreviewExerciseViewScreen() {
+    // Não é possível usar viewModel real no preview
     ExerciseViewScreen(
         navController = rememberNavController(),
-        exerciseId = String.toString()
+        exerciseId = "1",
+        viewModel = ExerciseViewModel()
     )
 }
 
 @Composable
 fun ExerciseViewScreen(
     navController: NavController,
-    exerciseId: String = "1"
+    exerciseId: String = "1",
+    viewModel: ExerciseViewModel
 ) {
-    // Redirecionar para login caso não esteja logado
-    if (!MockAuth.isLoggedIn()) {
+    val user: MutableLiveData<FirebaseUser?> = MutableLiveData()
+
+    // Verifica se o usuário está autenticado
+    if (user == null) {
         navController.navigate("login") {
             popUpTo(0) // Limpa toda a pilha de navegação
         }
+        return
     }
 
     val controller = remember { ExerciseController(navController) }
@@ -110,7 +120,7 @@ fun ExerciseViewScreen(
             try {
                 val player = ExoPlayer.Builder(context).build()
                 // Corrigir o formato da URL do YouTube
-                val videoUrl = "https://www.youtube.com/watch?v=${exercise?.videoUrl}"
+                val videoUrl = "https://www.youtube.com/watch?v=${exercise.videoUrl}"
                 val mediaItem = MediaItem.fromUri(videoUrl)
                 player.setMediaItem(mediaItem)
                 player.prepare()
@@ -258,17 +268,13 @@ fun ExerciseViewScreen(
             ) {
                 IconButton(
                     onClick = {
-                        if (isRunning) {
-                            isRunning = false  // Pausar o timer
-                        } else {
-                            isRunning = true  // Iniciar o timer
-                        }
+                        isRunning = !isRunning  // Alternar entre iniciar e pausar
                     },
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
-                        imageVector = if (isRunning) Icons.Default.PlayArrow else Icons.Default.PlayArrow,
-                        contentDescription = if (isRunning) "Pause" else "Play",
+                        imageVector = Icons.Default.PlayArrow,
+                        contentDescription = if (isRunning) "Pausar" else "Iniciar",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(32.dp)
                     )
@@ -283,7 +289,7 @@ fun ExerciseViewScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
-                        contentDescription = "Reset",
+                        contentDescription = "Reiniciar",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(32.dp)
                     )

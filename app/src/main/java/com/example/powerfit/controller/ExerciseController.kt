@@ -86,4 +86,5 @@ class ExerciseController(private val navController: NavController) {
     }
 
     fun getExercisesByCategory(category: String) = allExercises.flatMap { it.second }.filter { it.category == category }
+
 }
