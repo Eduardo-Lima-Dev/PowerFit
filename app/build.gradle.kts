@@ -45,6 +45,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx.v290)
     implementation(libs.androidx.activity.compose.v172)
     implementation(platform(libs.androidx.compose.bom.v20230901))
+    implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.ui)
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)

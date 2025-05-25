@@ -56,6 +56,10 @@ import com.example.powerfit.model.Role
 import com.example.powerfit.model.UserSessionViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 
 @Composable
 fun RegistrationScreen(navController: NavHostController, controller: RegistrationController, viewModel: UserSessionViewModel) {
@@ -266,11 +270,13 @@ fun RegistrationScreen(navController: NavHostController, controller: Registratio
                                                 .set(user)
                                                 .addOnSuccessListener {
                                                     Log.d("Firestore", "Usuário salvo com sucesso!")
-                                                    viewModel.loadUser()
-                                                    navController.navigate("home") {
-                                                        popUpTo("login") { inclusive = true }
-                                                    }
 
+                                                    CoroutineScope(Dispatchers.Main).launch {
+                                                        viewModel.loadUser()
+                                                        navController.navigate("home") {
+                                                            popUpTo("login") { inclusive = true }
+                                                        }
+                                                    }
                                                 }
                                                 .addOnFailureListener {
                                                     errorMessage = "Use um email válido e uma senha com pelo menos 8 dígitos!"

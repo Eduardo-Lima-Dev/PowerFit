@@ -3,23 +3,32 @@ package com.example.powerfit.model
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.tasks.await
 
 class UserSessionViewModel : ViewModel() {
     private val _user = mutableStateOf<User?>(null)
     val user: State<User?> get() = _user
 
-    fun loadUser() {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+    suspend fun loadUser(): Boolean {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return false
 
-        FirebaseFirestore.getInstance()
-            .collection("usuarios")
-            .document(uid)
-            .get()
-            .addOnSuccessListener { doc ->
-                _user.value = doc.toObject(User::class.java)
-            }
+        return try {
+            val documentSnapshot = Firebase.firestore
+                .collection("usuarios")
+                .document(uid)
+                .get()
+                .await()
+
+            val user = documentSnapshot.toObject(User::class.java)
+            _user.value = user
+            user?.role == Role.TEACHER
+        } catch (e: Exception) {
+            false
+        }
     }
 
     fun isTeacher(): Boolean {

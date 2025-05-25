@@ -48,6 +48,9 @@ import androidx.navigation.NavController
 import com.example.powerfit.R
 import com.example.powerfit.model.UserSessionViewModel
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: UserSessionViewModel) {
@@ -185,11 +188,13 @@ fun LoginScreen(navController: NavController, viewModel: UserSessionViewModel) {
                                 FirebaseAuth.getInstance()
                                     .signInWithEmailAndPassword(email, password)
                                     .addOnSuccessListener {
-                                        viewModel.loadUser()
-                                        navController.navigate(
-                                            if (viewModel.isTeacher()) "teacherHome" else "home"
-                                        ) {
-                                            popUpTo("login") { inclusive = true }
+                                        CoroutineScope(Dispatchers.Main).launch {
+                                            val role = viewModel.loadUser()
+                                            navController.navigate(
+                                                if (role) "teacherHome" else "home"
+                                            ) {
+                                                popUpTo("login") { inclusive = true }
+                                            }
                                         }
                                     }
                                     .addOnFailureListener {

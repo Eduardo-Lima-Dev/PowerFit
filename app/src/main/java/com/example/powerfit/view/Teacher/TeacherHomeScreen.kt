@@ -12,6 +12,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,20 +27,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.powerfit.ui.theme.BottomMenu
-import com.example.powerfit.model.MockAuth
 import com.example.powerfit.model.StudentViewModel
 import com.example.powerfit.model.UserSessionViewModel
 
 @Composable
 fun TeacherHomeScreen(navController: NavController, viewModel: UserSessionViewModel) {
-    // Redirecionar para login caso não esteja logado
-    if (!MockAuth.isLoggedIn()) {
-        navController.navigate("login") {
-            popUpTo(0) // Limpa toda a pilha de navegação
-        }
-    }
 
-    val user = MockAuth.currentUser
+    val user by viewModel.user
 
     val viewModel: StudentViewModel = viewModel()
     val vinculatedStudents = viewModel.vinculatedStudents
@@ -82,7 +79,7 @@ fun TeacherHomeScreen(navController: NavController, viewModel: UserSessionViewMo
             ) {
                 user?.let{
                     Text(
-                        text = "Olá, ${user.name}",
+                        text = "Olá, ${it.name}",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
