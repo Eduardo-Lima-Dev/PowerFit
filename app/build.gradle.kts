@@ -46,6 +46,8 @@ dependencies {
     implementation(libs.androidx.activity.compose.v172)
     implementation(platform(libs.androidx.compose.bom.v20230901))
     implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
     implementation(libs.ui)
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
