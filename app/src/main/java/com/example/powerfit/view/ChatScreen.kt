@@ -19,19 +19,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.powerfit.ui.theme.BottomMenu
-import com.example.powerfit.model.MockAuth
+import com.example.powerfit.controller.chat.ChatRequest
+import com.example.powerfit.controller.chat.ChatResponse
+import com.example.powerfit.controller.chat.Message
+import com.example.powerfit.controller.chat.RetrofitClient
 import com.example.powerfit.ui.theme.ChatBubble
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
 
 @Composable
 fun ChatScreen(navController: NavController) {
-    // Redirecionar para login caso não esteja logado
-    if (!MockAuth.isLoggedIn()) {
-        navController.navigate("login") {
-            popUpTo(0) // Limpa toda a pilha de navegação
-        }
-    }
-
     // Classe para representar mensagens com origem
     data class ChatMessage(
         val content: String,
@@ -41,10 +40,7 @@ fun ChatScreen(navController: NavController) {
     // Lista de mensagens com sua origem (usuário ou bot)
     val messages = remember {
         mutableStateListOf(
-            ChatMessage("Quantas repetições na rosca direta?", true),
-            ChatMessage("3x10!", false),
-            ChatMessage("Qual exercício eu posso trocar?", true),
-            ChatMessage("Smith", false)
+            ChatMessage("Olá, eu sou o PitBot. Como posso lhe ajudar?", false)
         )
     }
 
@@ -116,12 +112,24 @@ fun ChatScreen(navController: NavController) {
                 // Botão de enviar
                 IconButton(onClick = {
                     if (currentInput.isNotBlank()) {
-                        // Adicionar mensagem do usuário
                         messages.add(ChatMessage(currentInput, true))
 
-                        // Simular resposta do bot (em uma aplicação real, viria de uma API)
-                        val botResponse = "Resposta para: $currentInput"
-                        messages.add(ChatMessage(botResponse, false))
+                        // Requisição à LLM via OpenRouter
+                        val userMessage = Message("user", currentInput)
+                        val request = ChatRequest(messages = listOf(userMessage))
+
+                        RetrofitClient.api.sendMessage(request).enqueue(object : Callback<ChatResponse> {
+                            override fun onResponse(call: Call<ChatResponse>, response: Response<ChatResponse>) {
+                                val reply = response.body()?.choices?.firstOrNull()?.message?.content
+                                    ?: "Desculpe, não entendi."
+                                messages.add(ChatMessage(reply, false))
+                            }
+
+                            override fun onFailure(call: Call<ChatResponse>, t: Throwable) {
+                                val errorMsg = "Falha na comunicação: ${t.localizedMessage}"
+                                messages.add(ChatMessage(errorMsg, false))
+                            }
+                        })
 
                         currentInput = ""
                     }

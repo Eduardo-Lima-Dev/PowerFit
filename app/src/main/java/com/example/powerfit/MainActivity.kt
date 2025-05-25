@@ -45,6 +45,7 @@ import com.jakewharton.threetenabp.AndroidThreeTen
 class MainActivity : ComponentActivity() {
     private val userSessionViewModel: UserSessionViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
         AndroidThreeTen.init(applicationContext)

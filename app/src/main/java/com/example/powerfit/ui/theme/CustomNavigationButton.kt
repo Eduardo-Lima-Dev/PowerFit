@@ -24,6 +24,7 @@ fun CustomNavigationButton(
     icon: Int? = null,
     iconSize: Dp = 24.dp,
     clickable: Boolean = true,
+    clearBackStack: Boolean = false,
     onBeforeNav: () -> Unit = {},
     onAfterNav: () -> Unit = {},
 ) {
@@ -32,7 +33,16 @@ fun CustomNavigationButton(
         onClick = {
             if (clickable) {
                 onBeforeNav()
-                navController.navigate(navRoute)
+
+                if (clearBackStack) {
+                    navController.navigate(navRoute) {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                } else {
+                    navController.navigate(navRoute)
+                }
+
                 onAfterNav()
             }
         },

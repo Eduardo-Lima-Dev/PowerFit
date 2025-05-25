@@ -12,12 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,12 +40,7 @@ import com.example.powerfit.ui.theme.CustomNavigationButton
 
 @Composable
 fun SettingsScreen(navController: NavController, viewModel: UserSessionViewModel) {
-    // Redirecionar para login caso não esteja logado
-    if (!MockAuth.isLoggedIn()) {
-        navController.navigate("login") {
-            popUpTo(0) // Limpa toda a pilha de navegação
-        }
-    }
+    val user by viewModel.user
 
     Box(
         modifier = Modifier
@@ -60,7 +56,7 @@ fun SettingsScreen(navController: NavController, viewModel: UserSessionViewModel
     ) {
         IconButton(
             onClick = {
-                when (MockAuth.currentUser?.role) {
+                when (user?.role) {
                     Role.TEACHER -> { navController.navigate("teacherHome") }
                     Role.USER -> { navController.navigate("home") }
                     else -> { navController.navigate("login") }
@@ -71,7 +67,7 @@ fun SettingsScreen(navController: NavController, viewModel: UserSessionViewModel
                 .padding(8.dp)
         ) {
             Icon(
-                imageVector = Icons.Filled.ArrowBack,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Voltar"
             )
         }
@@ -96,20 +92,24 @@ fun SettingsScreen(navController: NavController, viewModel: UserSessionViewModel
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = MockAuth.currentUser!!.name,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+            user?.let {
+                Text(
+                    text = it.name,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = MockAuth.currentUser!!.email,
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+            user?.let {
+                Text(
+                    text = it.email,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -142,8 +142,9 @@ fun SettingsScreen(navController: NavController, viewModel: UserSessionViewModel
                 text = "Sair",
                 navRoute = "login",
                 navController = navController,
+                clearBackStack = true,
                 onBeforeNav = {
-                    MockAuth.logout()
+                    viewModel.clearUser()
                 }
             )
         }
