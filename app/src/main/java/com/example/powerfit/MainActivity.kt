@@ -114,17 +114,19 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel, userSessionViewModel: UserS
             ExerciseListScreen(navController = navController, category = category, viewModel = sharedViewModel)
         }
         composable("editStudent/{studentId}") { backStackEntry ->
-            val studentId = backStackEntry.arguments?.getString("studentId")?.toIntOrNull() ?: 0
+            val studentId = backStackEntry.arguments?.getString("studentId") ?: ""
             EditStudentScreen(
                 navController = navController,
-                studentId = studentId
+                studentId = studentId,
+                viewModel = userSessionViewModel
             )
         }
         composable("editWorkouts/{studentId}") { backStackEntry ->
             val studentId = backStackEntry.arguments?.getString("studentId")?.toIntOrNull() ?: 0
             EditWorkoutsScreen(
                 navController = navController,
-                studentId = studentId
+                studentId = studentId,
+                viewModel = userSessionViewModel
             )
         }
         composable(
@@ -180,7 +182,7 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel, userSessionViewModel: UserS
             TeacherHomeScreen(navController, userSessionViewModel)
         }
         composable("studentBinding") {
-            StudentBindingScreen(navController)
+            StudentBindingScreen(navController, userSessionViewModel)
         }
         composable("profilePhoto") {
             ProfilePhotoScreen(navController = navController)

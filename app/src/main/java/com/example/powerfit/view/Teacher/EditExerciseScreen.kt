@@ -19,9 +19,9 @@ import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.controller.ExerciseController
 import com.example.powerfit.model.Exercise
 import com.example.powerfit.model.ExerciseSet
-import com.example.powerfit.model.MockAuth
 import com.example.powerfit.model.Student
 import com.example.powerfit.model.StudentViewModel
+import com.example.powerfit.model.UserSessionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,38 +31,35 @@ fun EditExerciseScreen(
     category: String,
     exerciseId: String? = null
 ) {
-    // Redirecionar para login caso não esteja logado
-    if (!MockAuth.isLoggedIn()) {
-        navController.navigate("login") {
-            popUpTo(0) // Limpa toda a pilha de navegação
+    val userSessionViewModel: UserSessionViewModel = viewModel()
+    val user by userSessionViewModel.user
+
+    LaunchedEffect(user) {
+        if (user == null) {
+            navController.navigate("login") {
+                popUpTo(0)
+            }
         }
     }
 
     val viewModel: StudentViewModel = viewModel()
-    val student by remember { derivedStateOf {
-        viewModel.vinculatedStudents.find { it.id == studentId } ?: Student(
-            id = 0,
-            name = "",
-            age = 0,
-            trains = false,
-            hasComorbidity = false,
-            weight = 0f
-        )
-    } }
-
-    val exerciseController = remember { ExerciseController(navController) }
-
-    // Determina se estamos no modo de edição ou criação
-    val isEditMode = exerciseId != null
-
-    // Busca o exercício se estivermos no modo de edição
-    val exercise = remember(exerciseId) {
-        if (isEditMode) {
-            exerciseController.getExerciseById(exerciseId ?: "")
-        } else null
+    val student by remember {
+        derivedStateOf {
+            viewModel.vinculatedStudents.value.find { it.id == studentId.toString() } ?: Student(
+                id = "0",
+                name = "",
+                age = 0,
+                trains = false,
+                hasComorbidity = false,
+                weight = 0f
+            )
+        }
     }
 
-    // Estados para os campos do formulário
+    val exerciseController = remember { ExerciseController(navController) }
+    val isEditMode = exerciseId != null
+    val exercise = remember { exerciseId?.let { exerciseController.getExerciseById(it) } }
+
     var exerciseName by remember { mutableStateOf(exercise?.name ?: "") }
     var exerciseDescription by remember { mutableStateOf(exercise?.description ?: "") }
     var exerciseVideoUrl by remember { mutableStateOf(exercise?.videoUrl ?: "") }
@@ -91,7 +88,6 @@ fun EditExerciseScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -111,7 +107,6 @@ fun EditExerciseScreen(
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            // Informações do aluno
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -135,7 +130,6 @@ fun EditExerciseScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Formulário de edição
             OutlinedTextField(
                 value = exerciseName,
                 onValueChange = { exerciseName = it },
@@ -164,7 +158,6 @@ fun EditExerciseScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Configuração do treino
             Text(
                 text = "Configuração do Treino",
                 style = MaterialTheme.typography.titleMedium,
@@ -202,13 +195,10 @@ fun EditExerciseScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Botão salvar
             Button(
                 onClick = {
-                    // Aqui seria implementada a lógica para salvar o exercício
-                    // Simulação apenas para demonstração
                     val newExercise = Exercise(
-                        id = exerciseId ?: "novo_id", // Na implementação real, gere um ID
+                        id = exerciseId ?: "novo_id",
                         name = exerciseName,
                         category = category,
                         videoUrl = exerciseVideoUrl,
@@ -221,8 +211,6 @@ fun EditExerciseScreen(
                         ),
                         description = exerciseDescription
                     )
-
-                    // Aqui seria chamado o método para salvar o exercício
 
                     navController.popBackStack()
                 },

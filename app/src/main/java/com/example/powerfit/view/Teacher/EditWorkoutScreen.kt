@@ -5,8 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -23,31 +21,37 @@ import androidx.navigation.NavController
 import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.controller.ExerciseController
 import com.example.powerfit.model.Exercise
-import com.example.powerfit.model.MockAuth
 import com.example.powerfit.model.Student
 import com.example.powerfit.model.StudentViewModel
+import com.example.powerfit.model.UserSessionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditWorkoutsScreen(navController: NavController, studentId: Int) {
-    // Redirecionar para login caso não esteja logado
-    if (!MockAuth.isLoggedIn()) {
+fun EditWorkoutsScreen(navController: NavController, studentId: Int, viewModel: UserSessionViewModel) {
+    // Verificação do usuário Firebase
+    val user = viewModel.user.value
+
+    // Redirecionar para login caso não esteja autenticado
+    if (user == null) {
         navController.navigate("login") {
             popUpTo(0) // Limpa toda a pilha de navegação
         }
+        return
     }
 
-    val viewModel: StudentViewModel = viewModel()
-    val student by remember { derivedStateOf {
-        viewModel.vinculatedStudents.find { it.id == studentId } ?: Student(
-            id = 0,
-            name = "",
-            age = 0,
-            trains = false,
-            hasComorbidity = false,
-            weight = 0f
-        )
-    } }
+    val studentViewModel: StudentViewModel = viewModel()
+    val student by remember {
+        derivedStateOf {
+            studentViewModel.vinculatedStudents.value.find { it.id == studentId.toString() } ?: Student(
+                id = "0",
+                name = "",
+                age = 0,
+                trains = false,
+                hasComorbidity = false,
+                weight = 0f
+            )
+        }
+    }
 
     val exerciseController = remember { ExerciseController(navController) }
     val categories = listOf("Superior", "Costas", "Peito", "Inferior")

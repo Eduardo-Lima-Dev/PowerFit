@@ -35,8 +35,13 @@ fun TeacherHomeScreen(navController: NavController, viewModel: UserSessionViewMo
 
     val user by viewModel.user
 
-    val viewModel: StudentViewModel = viewModel()
-    val vinculatedStudents = viewModel.vinculatedStudents
+    val studentViewModel: StudentViewModel = viewModel()
+    val vinculatedStudents = studentViewModel.vinculatedStudents
+
+    // Recarrega os dados dos estudantes quando a tela é exibida
+    LaunchedEffect(key1 = true) {
+        studentViewModel.loadStudents()
+    }
 
     Box(
         modifier = Modifier
@@ -57,8 +62,7 @@ fun TeacherHomeScreen(navController: NavController, viewModel: UserSessionViewMo
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            // Imagem de Perfil
-            user?.let{
+            user?.let {
                 val painter = rememberAsyncImagePainter(model = it.profileImage)
 
                 Image(
@@ -72,12 +76,11 @@ fun TeacherHomeScreen(navController: NavController, viewModel: UserSessionViewMo
                 )
             }
 
-            // Nome do Professor com botão adicionar
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                user?.let{
+                user?.let {
                     Text(
                         text = "Olá, ${it.name}",
                         fontSize = 24.sp,
@@ -98,7 +101,6 @@ fun TeacherHomeScreen(navController: NavController, viewModel: UserSessionViewMo
                 }
             }
 
-            // Lista de Alunos
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -114,7 +116,7 @@ fun TeacherHomeScreen(navController: NavController, viewModel: UserSessionViewMo
                 )
 
                 LazyColumn {
-                    items(vinculatedStudents) { student ->
+                    items(vinculatedStudents.value) { student ->
                         StudentCard(
                             name = student.name,
                             onClick = { navController.navigate("editStudent/${student.id}") }
@@ -125,8 +127,11 @@ fun TeacherHomeScreen(navController: NavController, viewModel: UserSessionViewMo
             }
         }
 
-        // Menu Inferior de Navegação
-        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+        }
     }
 }
 
@@ -144,7 +149,6 @@ fun StudentCard(name: String, onClick: () -> Unit) {
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Avatar do aluno
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -158,18 +162,13 @@ fun StudentCard(name: String, onClick: () -> Unit) {
                     fontWeight = FontWeight.Bold
                 )
             }
-
-            // Nome do aluno
             Text(
                 text = name,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(start = 16.dp)
             )
-
             Spacer(modifier = Modifier.weight(1f))
-
-            // Ícone de navegação
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = "Ver detalhes",

@@ -15,36 +15,50 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.powerfit.ui.theme.BottomMenu
-import com.example.powerfit.model.MockAuth
 import com.example.powerfit.model.Student
 import com.example.powerfit.model.StudentViewModel
+import com.example.powerfit.model.UserSessionViewModel
 
 @Composable
-fun EditStudentScreen(navController: NavController, studentId: Int) {
-    // Redirecionar para login caso não esteja logado
-    if (!MockAuth.isLoggedIn()) {
+fun EditStudentScreen(navController: NavController, studentId: String, viewModel: UserSessionViewModel) {
+    // Verificação do usuário Firebase
+    val user = viewModel.user.value
+
+    // Redirecionar para login caso não esteja autenticado
+    if (user == null) {
         navController.navigate("login") {
             popUpTo(0) // Limpa toda a pilha de navegação
         }
+        return
     }
 
-    val viewModel: StudentViewModel = viewModel()
-    val student by remember { derivedStateOf {
-        viewModel.vinculatedStudents.find { it.id == studentId } ?: Student(
-            id = 0,
-            name = "",
-            age = 0,
-            trains = false,
-            hasComorbidity = false,
-            weight = 0f
-        )
-    } }
+    val studentViewModel: StudentViewModel = viewModel()
 
-    var editedName by remember { mutableStateOf(student.name) }
-    var editedAge by remember { mutableStateOf(student.age.toString()) }
-    var editedWeight by remember { mutableStateOf(student.weight.toString()) }
-    var editedTrains by remember { mutableStateOf(student.trains) }
-    var editedComorbidity by remember { mutableStateOf(student.hasComorbidity) }
+    // Garantir que os dados dos estudantes sejam carregados
+    LaunchedEffect(key1 = true) {
+        studentViewModel.loadStudents()
+    }
+
+    // Usar mutableState para armazenar o aluno encontrado
+    val vinculatedStudents = studentViewModel.vinculatedStudents.value
+    val student by remember(vinculatedStudents) {
+        mutableStateOf(
+            vinculatedStudents.find { it.id == studentId } ?: Student(
+                id = "0",
+                name = "",
+                age = 0,
+                trains = false,
+                hasComorbidity = false,
+                weight = 0f
+            )
+        )
+    }
+
+    var editedName by remember(student) { mutableStateOf(student.name) }
+    var editedAge by remember(student) { mutableStateOf(student.age.toString()) }
+    var editedWeight by remember(student) { mutableStateOf(student.weight.toString()) }
+    var editedTrains by remember(student) { mutableStateOf(student.trains) }
+    var editedComorbidity by remember(student) { mutableStateOf(student.hasComorbidity) }
 
     Box(
         modifier = Modifier
@@ -164,7 +178,7 @@ fun EditStudentScreen(navController: NavController, studentId: Int) {
                         trains = editedTrains,
                         hasComorbidity = editedComorbidity
                     )
-                    viewModel.updateVinculatedStudent(updatedStudent)
+                    studentViewModel.updateVinculatedStudent(updatedStudent)
                     navController.popBackStack()
                 },
                 modifier = Modifier.fillMaxWidth()
