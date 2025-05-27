@@ -20,7 +20,7 @@ import com.example.powerfit.model.StudentViewModel
 import com.example.powerfit.model.UserSessionViewModel
 
 @Composable
-fun EditStudentScreen(navController: NavController, studentId: Int, userViewModel: UserSessionViewModel) {
+fun EditStudentScreen(navController: NavController, studentId: String, userViewModel: UserSessionViewModel) {
 
     val user by userViewModel.user
 
@@ -35,7 +35,7 @@ fun EditStudentScreen(navController: NavController, studentId: Int, userViewMode
     val vinculatedStudents = studentViewModel.vinculatedStudents.value
     val student by remember(vinculatedStudents) {
         mutableStateOf(
-            vinculatedStudents.find { it.id == studentId.toString() } ?: Student(
+            vinculatedStudents.find { it.id == studentId } ?: Student(
                 id = "0",
                 name = "",
                 age = 0,
