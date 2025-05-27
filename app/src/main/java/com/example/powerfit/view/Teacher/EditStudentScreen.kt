@@ -24,23 +24,33 @@ fun EditStudentScreen(navController: NavController, studentId: Int, userViewMode
 
     val user by userViewModel.user
 
-    val viewModel: StudentViewModel = viewModel()
-    val student by remember { derivedStateOf {
-        viewModel.vinculatedStudents.find { it.id == studentId } ?: Student(
-            id = 0,
-            name = "",
-            age = 0,
-            trains = false,
-            hasComorbidity = false,
-            weight = 0f
-        )
-    } }
+    val studentViewModel: StudentViewModel = viewModel()
 
-    var editedName by remember { mutableStateOf(student.name) }
-    var editedAge by remember { mutableStateOf(student.age.toString()) }
-    var editedWeight by remember { mutableStateOf(student.weight.toString()) }
-    var editedTrains by remember { mutableStateOf(student.trains) }
-    var editedComorbidity by remember { mutableStateOf(student.hasComorbidity) }
+    // Garantir que os dados dos estudantes sejam carregados
+    LaunchedEffect(key1 = true) {
+        studentViewModel.loadStudents()
+    }
+
+    // Usar mutableState para armazenar o aluno encontrado
+    val vinculatedStudents = studentViewModel.vinculatedStudents.value
+    val student by remember(vinculatedStudents) {
+        mutableStateOf(
+            vinculatedStudents.find { it.id == studentId } ?: Student(
+                id = "0",
+                name = "",
+                age = 0,
+                trains = false,
+                hasComorbidity = false,
+                weight = 0f
+            )
+        )
+    }
+
+    var editedName by remember(student) { mutableStateOf(student.name) }
+    var editedAge by remember(student) { mutableStateOf(student.age.toString()) }
+    var editedWeight by remember(student) { mutableStateOf(student.weight.toString()) }
+    var editedTrains by remember(student) { mutableStateOf(student.trains) }
+    var editedComorbidity by remember(student) { mutableStateOf(student.hasComorbidity) }
 
     Box(
         modifier = Modifier
@@ -160,7 +170,7 @@ fun EditStudentScreen(navController: NavController, studentId: Int, userViewMode
                         trains = editedTrains,
                         hasComorbidity = editedComorbidity
                     )
-                    viewModel.updateVinculatedStudent(updatedStudent)
+                    studentViewModel.updateVinculatedStudent(updatedStudent)
                     navController.popBackStack()
                 },
                 modifier = Modifier.fillMaxWidth()

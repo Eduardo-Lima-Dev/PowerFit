@@ -29,17 +29,19 @@ import com.example.powerfit.model.UserSessionViewModel
 fun EditWorkoutsScreen(navController: NavController, studentId: Int, userViewModel: UserSessionViewModel) {
     val user by userViewModel.user
 
-    val viewModel: StudentViewModel = viewModel()
-    val student by remember { derivedStateOf {
-        viewModel.vinculatedStudents.find { it.id == studentId } ?: Student(
-            id = 0,
-            name = "",
-            age = 0,
-            trains = false,
-            hasComorbidity = false,
-            weight = 0f
-        )
-    } }
+    val studentViewModel: StudentViewModel = viewModel()
+    val student by remember {
+        derivedStateOf {
+            studentViewModel.vinculatedStudents.value.find { it.id == studentId.toString() } ?: Student(
+                id = "0",
+                name = "",
+                age = 0,
+                trains = false,
+                hasComorbidity = false,
+                weight = 0f
+            )
+        }
+    }
 
     val exerciseController = remember { ExerciseController(navController) }
     val categories = listOf("Superior", "Costas", "Peito", "Inferior")

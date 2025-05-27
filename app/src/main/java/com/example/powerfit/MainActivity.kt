@@ -114,7 +114,7 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel, userSessionViewModel: UserS
             ExerciseListScreen(navController = navController, category = category, viewModel = sharedViewModel, userSessionViewModel)
         }
         composable("editStudent/{studentId}") { backStackEntry ->
-            val studentId = backStackEntry.arguments?.getString("studentId")?.toIntOrNull() ?: 0
+            val studentId = backStackEntry.arguments?.getString("studentId") ?: ""
             EditStudentScreen(
                 navController = navController,
                 studentId = studentId,
