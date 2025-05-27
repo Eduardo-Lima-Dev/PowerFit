@@ -117,7 +117,7 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel, userSessionViewModel: UserS
             val studentId = backStackEntry.arguments?.getString("studentId") ?: ""
             EditStudentScreen(
                 navController = navController,
-                studentId = studentId,
+                studentId = studentId.toIntOrNull() ?: 0,
                 userSessionViewModel
             )
         }
