@@ -3,88 +3,112 @@ package com.example.powerfit.controller
 import androidx.navigation.NavController
 import com.example.powerfit.model.Exercise
 import com.example.powerfit.model.ExerciseSet
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class ExerciseController(private val navController: NavController) {
-    private val allExercises = listOf(
-        "Superior" to listOf(
-            Exercise(
-                id = "1",
-                name = "Rosca Direta",
-                category = "Superior",
-                videoUrl = "Q8TqfD8E7BU",
-                sets = listOf(ExerciseSet(sets = 3, reps = 10)),
-                description = "Rosca Direta é um exercício que trabalha os músculos do bíceps..."
-            ),
-            Exercise(
-                id = "2",
-                name = "Elevacao Lateral",
-                videoUrl = "video_id_2",
-                category = "Superior",
-                sets = listOf(ExerciseSet(sets = 3, reps = 12)),
-                description = "Elevação Lateral é um exercício que trabalha os músculos dos ombros..."
-            ),
-            Exercise(
-                id = "3",
-                name = "Rosca Martelo",
-                category = "Superior",
-                videoUrl = "video_id_3",
-                sets = listOf(ExerciseSet(sets = 3, reps = 10)),
-                description = "Rosca Martelo é um exercício de musculação que foca no bíceps e antebraço..."
-            )
-        ),
-        "Costas" to listOf(
-            Exercise(
-                id = "4",
-                name = "Remada Curva",
-                category = "Costas",
-                videoUrl = "video_id_4",
-                sets = listOf(ExerciseSet(sets = 3, reps = 10)),
-                description = "Remada Curva é um exercício que trabalha os músculos das costas..."
-            ),
-            Exercise(
-                id = "5",
-                name = "Flexao de Ombro",
-                category = "Costas",
-                videoUrl = "video_id_5",
-                sets = listOf(ExerciseSet(sets = 3, reps = 15)),
-                description = "Flexão de Ombro é um exercício que trabalha os músculos do ombro e parte superior das costas..."
-            )
-        ),
-        "Peito" to listOf(
-            Exercise(
-                id = "6",
-                name = "Supino Reto",
-                category = "Peito",
-                videoUrl = "video_id_6",
-                sets = listOf(ExerciseSet(sets = 3, reps = 10)),
-                description = "Supino Reto é um exercício de musculação que foca no peitoral..."
-            ),
-            Exercise(
-                id = "7",
-                name = "Supino Inclinado",
-                category = "Peito",
-                videoUrl = "video_id_7",
-                sets = listOf(ExerciseSet(sets = 3, reps = 12)),
-                description = "Supino Inclinado é um exercício de musculação que foca no peitoral superior..."
-            )
-        ),
-        "Inferior" to listOf(
-            Exercise(
-                id = "8",
-                name = "Agachamento",
-                category = "Inferior",
-                videoUrl = "video_id_8",
-                sets = listOf(ExerciseSet(sets = 3, reps = 12)),
-                description = "Agachamento é um exercício que trabalha principalmente os músculos das pernas..."
-            ),
-        ),
-    )
-    private val exerciseMap = allExercises.flatMap { it.second }.associateBy { it.id }
+    private val db = FirebaseFirestore.getInstance()
+    private val exercisesCollection = db.collection("exercises")
 
-    fun getExerciseById(id: String): Exercise? {
-        return exerciseMap[id]
+    // StateFlow para armazenar exercícios carregados
+    private val _exercises = MutableStateFlow<List<Exercise>>(emptyList())
+    val exercises = _exercises.asStateFlow()
+
+    // Carrega todos os exercícios do aluno específico
+    suspend fun loadExercises(studentId: String) {
+        try {
+            val snapshot = exercisesCollection
+                .whereEqualTo("studentId", studentId)
+                .get()
+                .await()
+
+            val exerciseList = snapshot.documents.mapNotNull {
+                it.toObject(Exercise::class.java)
+            }
+
+            _exercises.value = exerciseList
+        } catch (e: Exception) {
+            // Tratar erro - poderia registrar um log ou notificar o usuário
+        }
     }
 
-    fun getExercisesByCategory(category: String) = allExercises.flatMap { it.second }.filter { it.category == category }
+    // Obtém exercícios por categoria e ID do estudante
+    fun getExercisesByCategory(category: String): List<Exercise> {
+        return _exercises.value.filter { it.category == category }
+    }
 
+    // Obtém exercícios por categoria e studentId diretamente do Firebase
+    fun getExercisesByCategoryFromFirebase(category: String, studentId: String, callback: (List<Exercise>) -> Unit) {
+        exercisesCollection
+            .whereEqualTo("category", category)
+            .whereEqualTo("studentId", studentId)
+            .get()
+            .addOnSuccessListener { documents ->
+                val exercises = documents.mapNotNull { it.toObject(Exercise::class.java) }
+                callback(exercises)
+            }
+            .addOnFailureListener { _ ->
+                callback(emptyList())
+            }
+    }
+
+    // Obtém um exercício pelo ID
+    fun getExerciseById(id: String): Exercise? {
+        return _exercises.value.find { it.id == id }
+    }
+
+    // Adiciona um novo exercício
+    suspend fun addExercise(exercise: Exercise): Boolean {
+        return try {
+            val documentRef = exercisesCollection.document()
+            val exerciseWithId = exercise.copy(id = documentRef.id)
+            documentRef.set(exerciseWithId).await()
+
+            // Atualiza o estado local
+            val currentExercises = _exercises.value.toMutableList()
+            currentExercises.add(exerciseWithId)
+            _exercises.value = currentExercises
+
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    // Atualiza um exercício existente
+    suspend fun updateExercise(exercise: Exercise): Boolean {
+        return try {
+            exercisesCollection.document(exercise.id).set(exercise).await()
+
+            // Atualiza o estado local
+            val currentExercises = _exercises.value.toMutableList()
+            val index = currentExercises.indexOfFirst { it.id == exercise.id }
+            if (index >= 0) {
+                currentExercises[index] = exercise
+                _exercises.value = currentExercises
+            }
+
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    // Remove um exercício
+    suspend fun deleteExercise(exerciseId: String): Boolean {
+        return try {
+            exercisesCollection.document(exerciseId).delete().await()
+
+            // Atualiza o estado local
+            val currentExercises = _exercises.value.toMutableList()
+            currentExercises.removeAll { it.id == exerciseId }
+            _exercises.value = currentExercises
+
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
 }
