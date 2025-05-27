@@ -30,6 +30,7 @@ import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.controller.ExerciseController
 import com.example.powerfit.controller.ExerciseViewModel
 import com.example.powerfit.model.Exercise
+import com.example.powerfit.model.UserSessionViewModel
 import com.google.firebase.auth.FirebaseUser
 
 @SuppressLint("ViewModelConstructorInComposable")
@@ -37,7 +38,8 @@ import com.google.firebase.auth.FirebaseUser
 fun ExerciseListScreen(
     navController: NavController,
     category: String,
-    viewModel: ExerciseViewModel
+    viewModel: ExerciseViewModel,
+    userViewModel: UserSessionViewModel
 ) {
     val user: MutableLiveData<FirebaseUser?> = MutableLiveData()
 
@@ -144,7 +146,7 @@ fun ExerciseListScreen(
                 }
             }
         }
-        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter), userViewModel)
     }
 }
 

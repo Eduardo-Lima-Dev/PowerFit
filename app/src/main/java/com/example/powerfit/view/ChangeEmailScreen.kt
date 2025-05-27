@@ -1,12 +1,10 @@
 package com.example.powerfit.view
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +19,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -29,7 +26,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,40 +33,32 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.powerfit.model.User
 import com.example.powerfit.R
-import com.example.powerfit.model.MockAuth
+import com.example.powerfit.model.UserSessionViewModel
 
 @Composable
-fun ChangeEmailScreen(navController: NavController) {
-    // Redirecionar para login caso não esteja logado
-    if (!MockAuth.isLoggedIn()) {
-        navController.navigate("login") {
-            popUpTo(0) // Limpa toda a pilha de navegação
-        }
-    }
-
-    var email by remember { mutableStateOf("") }
+fun ChangeEmailScreen(navController: NavController, viewModel: UserSessionViewModel) {
+    var currentPassword by remember { mutableStateOf("") }
+    var newEmail by remember { mutableStateOf("") }
+    var confirmEmail by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
+    var successMessage by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
+                Brush.verticalGradient(
+                    listOf(
                         MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                         MaterialTheme.colorScheme.background
                     )
@@ -83,10 +71,7 @@ fun ChangeEmailScreen(navController: NavController) {
                 .align(Alignment.TopStart)
                 .padding(8.dp)
         ) {
-            Icon(
-                imageVector = Icons.Filled.ArrowBack,
-                contentDescription = "Voltar"
-            )
+            Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Voltar")
         }
 
         Column(
@@ -97,7 +82,6 @@ fun ChangeEmailScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // App Logo
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "PowerFit Logo",
@@ -106,12 +90,10 @@ fun ChangeEmailScreen(navController: NavController) {
                     .padding(bottom = 6.dp)
             )
 
-            // Change Email Form
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(4.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -126,101 +108,107 @@ fun ChangeEmailScreen(navController: NavController) {
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
-                    // Email Field
                     OutlinedTextField(
-                        value = email,
+                        value = currentPassword,
                         onValueChange = {
-                            email = it
+                            currentPassword = it
                             errorMessage = ""
                         },
-                        label = { Text("Email") },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Email,
-                                contentDescription = "Email Icon",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        },
+                        label = { Text("Senha atual") },
+                        leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Email,
-                            imeAction = ImeAction.Next
-                        ),
-                        shape = RoundedCornerShape(12.dp),
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp)
                     )
 
-                    // Confirmation Field
                     OutlinedTextField(
-                        value = email,
+                        value = newEmail,
                         onValueChange = {
-                            email = it
+                            newEmail = it
                             errorMessage = ""
                         },
-                        label = { Text("Confirm Email") },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Email,
-                                contentDescription = "Email Icon",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        },
+                        label = { Text("Novo email") },
+                        leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Email,
-                            imeAction = ImeAction.Next
-                        ),
-                        shape = RoundedCornerShape(12.dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp)
                     )
 
-                    // Error Message
-                    AnimatedVisibility(visible = errorMessage.isNotEmpty()) {
+                    OutlinedTextField(
+                        value = confirmEmail,
+                        onValueChange = {
+                            confirmEmail = it
+                            errorMessage = ""
+                        },
+                        label = { Text("Confirmar novo email") },
+                        leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                    )
+
+                    if (errorMessage.isNotEmpty()) {
                         Text(
                             text = errorMessage,
                             color = MaterialTheme.colorScheme.error,
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(vertical = 8.dp)
+                            modifier = Modifier.padding(vertical = 4.dp)
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    if (successMessage.isNotEmpty()) {
+                        Text(
+                            text = successMessage,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                    }
 
-                    // Change Button
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     Button(
                         onClick = {
-                                navController.navigate("settings")
+                            if (newEmail != confirmEmail) {
+                                errorMessage = "Os emails não coincidem"
+                            } else if (newEmail.isBlank() || currentPassword.isBlank()) {
+                                errorMessage = "Preencha todos os campos"
+                            } else {
+                                isLoading = true
+                                viewModel.reauthenticate(currentPassword) { success, error ->
+                                    if (success) {
+                                        viewModel.changeEmail(newEmail) { emailChanged, errorEmail ->
+                                            isLoading = false
+                                            if (emailChanged) {
+                                                successMessage = "Email atualizado com sucesso! Verifique o novo email para ativá-lo."
+                                                errorMessage = ""
+                                            } else {
+                                                errorMessage = errorEmail ?: "Erro ao atualizar email"
+                                                successMessage = ""
+                                            }
+                                        }
+                                    } else {
+                                        isLoading = false
+                                        errorMessage = error ?: "Falha na reautenticação"
+                                    }
+                                }
+                            }
                         },
+                        enabled = !isLoading,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        )
+                            .height(52.dp),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text(
-                            "ALTERAR",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text("ALTERAR EMAIL", fontSize = 16.sp)
                     }
-
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewChangeEmailScreen() {
-    MaterialTheme {
-        ChangeEmailScreen(navController = NavController(LocalContext.current))
     }
 }

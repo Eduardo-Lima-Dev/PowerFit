@@ -25,14 +25,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.powerfit.R
-import com.example.powerfit.model.MockAuth
 import com.example.powerfit.model.Role
 import com.example.powerfit.model.UserSessionViewModel
 import com.example.powerfit.ui.theme.BottomMenu
@@ -78,17 +75,21 @@ fun SettingsScreen(navController: NavController, viewModel: UserSessionViewModel
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            Spacer(modifier = Modifier.height(32.dp)) 
+            Spacer(modifier = Modifier.height(32.dp))
 
-            Image(
-                painter = painterResource(id = R.drawable.profile_icon),
-                contentDescription = "User Profile",
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                    .padding(8.dp)
-            )
+            user?.let {
+                val painter = rememberAsyncImagePainter(it.profileImage)
+
+                Image(
+                    painter = painter,
+                    contentDescription = "User Profile",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                        .padding(8.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -148,6 +149,6 @@ fun SettingsScreen(navController: NavController, viewModel: UserSessionViewModel
                 }
             )
         }
-        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter), viewModel)
     }
 }

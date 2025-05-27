@@ -33,23 +33,15 @@ import com.example.powerfit.R
 import com.example.powerfit.controller.ExerciseViewModel
 import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.controller.HomeController
+import com.example.powerfit.model.UserSessionViewModel
 import com.example.powerfit.ui.theme.CustomNavigationButton
 import com.google.firebase.auth.FirebaseUser
 
 @SuppressLint("ViewModelConstructorInComposable")
 @Composable
-fun ExerciseSelectionScreen(navController: NavController, viewModel: ExerciseViewModel) {
+fun ExerciseSelectionScreen(navController: NavController, viewModel: ExerciseViewModel, userViewModel: UserSessionViewModel) {
 //    val user = viewModel.user.value
     val user: MutableLiveData<FirebaseUser?> = MutableLiveData()
-
-    // Verifica se o usuário está autenticado
-    if (user == null) {
-        navController.navigate("login") {
-            popUpTo(0) // Limpa toda a pilha de navegação
-        }
-        return
-    }
-
     val controller = remember { HomeController(navController) }
 
     Box(
@@ -144,6 +136,6 @@ fun ExerciseSelectionScreen(navController: NavController, viewModel: ExerciseVie
             }
         }
         // Menu Inferior de Navegação
-        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter), userViewModel)
     }
 }

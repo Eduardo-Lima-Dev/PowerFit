@@ -1,62 +1,60 @@
 package com.example.powerfit.view
 
+import android.content.Context
 import android.net.Uri
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.powerfit.R
+import com.example.powerfit.controller.Env
+import com.example.powerfit.model.UserSessionViewModel
 import com.example.powerfit.ui.theme.BottomMenu
+import java.io.File
+import java.io.FileOutputStream
 
 @Composable
-fun ProfilePhotoScreen(navController: NavController) {
+fun ProfilePhotoScreen(navController: NavController, viewModel: UserSessionViewModel) {
+    val user by viewModel.user
     val context = LocalContext.current
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Permissão para galeria
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
+    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
             selectedImageUri = it
-            // Aqui você salvaria a imagem no seu modelo de usuário
-            // MockAuth.currentUser?.profileImage = ...
-            // Voltar para tela de configurações
-            navController.popBackStack()
+            val tempFile = copyUriToFile(context, it)
+            if (tempFile != null) {
+                val fileUri = Uri.fromFile(tempFile)
+
+                viewModel.uploadProfileImage(context, fileUri, Env.imgurClientId) { success, message ->
+                    if (success) {
+                        Toast.makeText(context, message ?: "Sucesso!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Erro: $message", Toast.LENGTH_LONG).show()
+                    }
+                }
+
+            } else {
+                Toast.makeText(context, "Erro ao processar imagem", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -78,39 +76,35 @@ fun ProfilePhotoScreen(navController: NavController) {
                 .align(Alignment.TopStart)
                 .padding(8.dp)
         ) {
-            Icon(
-                imageVector = Icons.Filled.ArrowBack,
-                contentDescription = "Voltar"
-            )
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
         }
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 24.dp, vertical = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(48.dp))
 
-            Text(
-                text = "Alterar foto de perfil",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+            Text("Alterar foto de perfil", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Image(
-                painter = painterResource(id = R.drawable.profile_icon),
-                contentDescription = "User Profile",
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                    .padding(8.dp)
-            )
+            user?.let {
+                val painter = rememberAsyncImagePainter(it.profileImage)
+
+                Image(
+                    painter = painter,
+                    contentDescription = "User Profile",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                        .padding(8.dp)
+                )
+            }
+
 
             Spacer(modifier = Modifier.height(48.dp))
 
@@ -120,15 +114,30 @@ fun ProfilePhotoScreen(navController: NavController) {
                     .fillMaxWidth()
                     .height(56.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Galeria"
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(text = "Escolher da galeria")
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Escolher da galeria")
             }
         }
 
-        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+        BottomMenu(
+            navController = navController,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            viewModel = viewModel
+        )
+    }
+}
+
+private fun copyUriToFile(context: Context, uri: Uri): File? {
+    return try {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        val tempFile = File.createTempFile("profile_", ".jpg", context.cacheDir)
+        val outputStream = FileOutputStream(tempFile)
+        inputStream?.copyTo(outputStream)
+        inputStream?.close()
+        outputStream.close()
+        tempFile
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
     }
 }

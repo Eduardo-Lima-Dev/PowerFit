@@ -53,39 +53,21 @@ import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.controller.ExerciseController
 import com.example.powerfit.controller.ExerciseViewModel
 import com.example.powerfit.model.ExerciseSet
+import com.example.powerfit.model.UserSessionViewModel
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.delay
 
-@SuppressLint("ViewModelConstructorInComposable")
-@Preview(showBackground = true)
-@Composable
-fun PreviewExerciseViewScreen() {
-    // Não é possível usar viewModel real no preview
-    ExerciseViewScreen(
-        navController = rememberNavController(),
-        exerciseId = "1",
-        viewModel = ExerciseViewModel()
-    )
-}
-
 @Composable
 fun ExerciseViewScreen(
     navController: NavController,
     exerciseId: String = "1",
-    viewModel: ExerciseViewModel
+    viewModel: ExerciseViewModel,
+    userViewModel: UserSessionViewModel
 ) {
     val user: MutableLiveData<FirebaseUser?> = MutableLiveData()
-
-    // Verifica se o usuário está autenticado
-    if (user == null) {
-        navController.navigate("login") {
-            popUpTo(0) // Limpa toda a pilha de navegação
-        }
-        return
-    }
 
     val controller = remember { ExerciseController(navController) }
     val exercise = controller.getExerciseById(exerciseId)
@@ -320,7 +302,7 @@ fun ExerciseViewScreen(
                 }
             }
         }
-        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter), userViewModel)
     }
 }
 

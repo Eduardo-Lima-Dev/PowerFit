@@ -43,9 +43,11 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx.v1150)
     implementation(libs.androidx.lifecycle.runtime.ktx.v290)
-    implementation(libs.androidx.activity.compose.v172)
     implementation(platform(libs.androidx.compose.bom.v20230901))
     implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.firebase.storage.ktx)
+    implementation(libs.androidx.activity.compose.v190)
+    implementation(libs.androidx.core.ktx.v1131)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.dotenv.kotlin)
@@ -59,6 +61,7 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.androidx.media3.common.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit.v121)

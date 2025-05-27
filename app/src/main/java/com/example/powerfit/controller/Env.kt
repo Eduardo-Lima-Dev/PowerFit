@@ -11,4 +11,5 @@ object Env {
     val apiKey: String = dotenv["SECRET_API_KEY"]
     val baseUrl: String = dotenv["BASE_URL"]
     val modelName: String = dotenv["MODEL_NAME"]
+    val imgurClientId: String = dotenv["IMGUR_CLIENT_ID"]
 }

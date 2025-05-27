@@ -15,18 +15,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.powerfit.ui.theme.BottomMenu
-import com.example.powerfit.model.MockAuth
 import com.example.powerfit.model.Student
 import com.example.powerfit.model.StudentViewModel
+import com.example.powerfit.model.UserSessionViewModel
 
 @Composable
-fun EditStudentScreen(navController: NavController, studentId: Int) {
-    // Redirecionar para login caso não esteja logado
-    if (!MockAuth.isLoggedIn()) {
-        navController.navigate("login") {
-            popUpTo(0) // Limpa toda a pilha de navegação
-        }
-    }
+fun EditStudentScreen(navController: NavController, studentId: Int, userViewModel: UserSessionViewModel) {
+
+    val user by userViewModel.user
 
     val viewModel: StudentViewModel = viewModel()
     val student by remember { derivedStateOf {
@@ -173,6 +169,6 @@ fun EditStudentScreen(navController: NavController, studentId: Int) {
             }
         }
 
-        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter), userViewModel)
     }
 }

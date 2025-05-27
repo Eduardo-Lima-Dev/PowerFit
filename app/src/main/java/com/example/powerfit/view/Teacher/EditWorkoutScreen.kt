@@ -1,12 +1,9 @@
 package com.example.powerfit.view.Teacher
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -23,19 +20,14 @@ import androidx.navigation.NavController
 import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.controller.ExerciseController
 import com.example.powerfit.model.Exercise
-import com.example.powerfit.model.MockAuth
 import com.example.powerfit.model.Student
 import com.example.powerfit.model.StudentViewModel
+import com.example.powerfit.model.UserSessionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditWorkoutsScreen(navController: NavController, studentId: Int) {
-    // Redirecionar para login caso não esteja logado
-    if (!MockAuth.isLoggedIn()) {
-        navController.navigate("login") {
-            popUpTo(0) // Limpa toda a pilha de navegação
-        }
-    }
+fun EditWorkoutsScreen(navController: NavController, studentId: Int, userViewModel: UserSessionViewModel) {
+    val user by userViewModel.user
 
     val viewModel: StudentViewModel = viewModel()
     val student by remember { derivedStateOf {
@@ -211,7 +203,7 @@ fun EditWorkoutsScreen(navController: NavController, studentId: Int) {
             }
         }
 
-        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter), userViewModel)
     }
 }
 

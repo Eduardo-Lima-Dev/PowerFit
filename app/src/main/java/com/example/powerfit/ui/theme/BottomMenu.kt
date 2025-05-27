@@ -15,14 +15,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.powerfit.model.Role
 import com.example.powerfit.model.UserSessionViewModel
 
 @Composable
-fun BottomMenu(navController: NavController, modifier: Modifier = Modifier) {
-    val viewModel: UserSessionViewModel = viewModel()
+fun BottomMenu(navController: NavController, modifier: Modifier = Modifier, viewModel: UserSessionViewModel) {
     Row(
         modifier = modifier
             .fillMaxWidth()

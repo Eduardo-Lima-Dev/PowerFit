@@ -6,6 +6,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -17,26 +18,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.powerfit.controller.ChartController
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
+import com.example.powerfit.model.UserSessionViewModel
 import com.example.powerfit.ui.theme.BottomMenu
-import com.example.powerfit.model.MockAuth
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewChartScreen() {
-    val navController = rememberNavController()
-    ChartScreen(navController = navController)
-}
 
 @Composable
-fun ChartScreen(navController: NavController) {
-    // Redirecionar para login caso não esteja logado
-    if (!MockAuth.isLoggedIn()) {
-        navController.navigate("login") {
-            popUpTo(0) // Limpa toda a pilha de navegação
-        }
-    }
+fun ChartScreen(navController: NavController, viewModel: UserSessionViewModel) {
+
+    val user by viewModel.user
 
     val chartController = ChartController()
     val chartData = chartController.getChartData()
@@ -50,9 +38,6 @@ fun ChartScreen(navController: NavController) {
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
-        },
-        bottomBar = {
-            BottomMenu(navController = navController)
         }
     ) { innerPadding ->
         Column(

@@ -19,9 +19,9 @@ import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.controller.ExerciseController
 import com.example.powerfit.model.Exercise
 import com.example.powerfit.model.ExerciseSet
-import com.example.powerfit.model.MockAuth
 import com.example.powerfit.model.Student
 import com.example.powerfit.model.StudentViewModel
+import com.example.powerfit.model.UserSessionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,14 +29,11 @@ fun EditExerciseScreen(
     navController: NavController,
     studentId: Int,
     category: String,
-    exerciseId: String? = null
+    exerciseId: String? = null,
+    userViewModel: UserSessionViewModel
 ) {
-    // Redirecionar para login caso não esteja logado
-    if (!MockAuth.isLoggedIn()) {
-        navController.navigate("login") {
-            popUpTo(0) // Limpa toda a pilha de navegação
-        }
-    }
+
+    val user by userViewModel.user
 
     val viewModel: StudentViewModel = viewModel()
     val student by remember { derivedStateOf {
@@ -232,6 +229,6 @@ fun EditExerciseScreen(
             }
         }
 
-        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter), userViewModel)
     }
 }

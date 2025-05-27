@@ -31,9 +31,9 @@ import com.example.powerfit.model.StudentViewModel
 import com.example.powerfit.model.UserSessionViewModel
 
 @Composable
-fun TeacherHomeScreen(navController: NavController, viewModel: UserSessionViewModel) {
+fun TeacherHomeScreen(navController: NavController, userViewModel: UserSessionViewModel) {
 
-    val user by viewModel.user
+    val user by userViewModel.user
 
     val viewModel: StudentViewModel = viewModel()
     val vinculatedStudents = viewModel.vinculatedStudents
@@ -126,7 +126,7 @@ fun TeacherHomeScreen(navController: NavController, viewModel: UserSessionViewMo
         }
 
         // Menu Inferior de Navegação
-        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter), userViewModel)
     }
 }
 

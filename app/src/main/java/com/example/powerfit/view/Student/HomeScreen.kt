@@ -180,7 +180,7 @@ fun HomeScreen(navController: NavController, viewModel: UserSessionViewModel) {
                 }
             }
             // Menu Inferior de Navegação (com fundo escuro)
-            BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+            BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter), viewModel)
         }
     }
 }

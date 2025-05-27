@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -29,7 +27,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,31 +36,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.powerfit.model.User
 import com.example.powerfit.R
-import com.example.powerfit.model.MockAuth
+import com.example.powerfit.model.UserSessionViewModel
 
 @Composable
-fun ChangePasswordScreen(navController: NavController) {
-    // Redirecionar para login caso não esteja logado
-    if (!MockAuth.isLoggedIn()) {
-        navController.navigate("login") {
-            popUpTo(0) // Limpa toda a pilha de navegação
-        }
-    }
-
-    var password by remember { mutableStateOf("") }
+fun ChangePasswordScreen(navController: NavController, viewModel: UserSessionViewModel) {
+    var currentPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -97,7 +87,6 @@ fun ChangePasswordScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // App Logo
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "PowerFit Logo",
@@ -106,7 +95,6 @@ fun ChangePasswordScreen(navController: NavController) {
                     .padding(bottom = 6.dp)
             )
 
-            // Change Password Form
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -126,61 +114,85 @@ fun ChangePasswordScreen(navController: NavController) {
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
-                    // Password Field
+                    // Campo senha atual
                     OutlinedTextField(
-                        value = password,
+                        value = currentPassword,
                         onValueChange = {
-                            password = it
+                            currentPassword = it
                             errorMessage = ""
                         },
-                        label = { Text("Password") },
+                        label = { Text("Senha atual") },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Lock,
-                                contentDescription = "Password Icon",
+                                contentDescription = "Senha atual",
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(
+                        keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Password,
-                            imeAction = ImeAction.Done
+                            imeAction = ImeAction.Next
                         ),
-                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 8.dp)
                     )
 
-                    // Confirmation Field
+                    // Nova senha
                     OutlinedTextField(
-                        value = password,
+                        value = newPassword,
                         onValueChange = {
-                            password = it
+                            newPassword = it
                             errorMessage = ""
                         },
-                        label = { Text(" Confirm Password") },
+                        label = { Text("Nova senha") },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Lock,
-                                contentDescription = "Password Icon",
+                                contentDescription = "Nova senha",
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(
+                        keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Password,
-                            imeAction = ImeAction.Done
+                            imeAction = ImeAction.Next
                         ),
-                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 8.dp)
                     )
 
-                    // Error Message
+                    // Confirmar nova senha
+                    OutlinedTextField(
+                        value = confirmPassword,
+                        onValueChange = {
+                            confirmPassword = it
+                            errorMessage = ""
+                        },
+                        label = { Text("Confirmar nova senha") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Lock,
+                                contentDescription = "Confirmar senha",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Done
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                    )
+
+                    // Erros
                     AnimatedVisibility(visible = errorMessage.isNotEmpty()) {
                         Text(
                             text = errorMessage,
@@ -192,11 +204,36 @@ fun ChangePasswordScreen(navController: NavController) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Change Button
+                    // Botão ALTERAR
                     Button(
                         onClick = {
-                                navController.navigate("settings")
+                            if (newPassword != confirmPassword) {
+                                errorMessage = "As senhas não coincidem."
+                                return@Button
+                            }
+                            if (newPassword.length < 6) {
+                                errorMessage = "A nova senha deve ter ao menos 6 caracteres."
+                                return@Button
+                            }
+
+                            isLoading = true
+                            viewModel.reauthenticate(currentPassword) { success, error ->
+                                if (success) {
+                                    viewModel.changePassword(newPassword) { updated, updateError ->
+                                        isLoading = false
+                                        if (updated) {
+                                            navController.navigate("settings")
+                                        } else {
+                                            errorMessage = updateError ?: "Erro ao alterar a senha."
+                                        }
+                                    }
+                                } else {
+                                    isLoading = false
+                                    errorMessage = error ?: "Reautenticação falhou."
+                                }
+                            }
                         },
+                        enabled = !isLoading,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
@@ -206,7 +243,7 @@ fun ChangePasswordScreen(navController: NavController) {
                         )
                     ) {
                         Text(
-                            "ALTERAR",
+                            if (isLoading) "Processando..." else "ALTERAR",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -216,13 +253,5 @@ fun ChangePasswordScreen(navController: NavController) {
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewChangePasswordScreen() {
-    MaterialTheme {
-        ChangePasswordScreen(navController = NavController(LocalContext.current))
     }
 }

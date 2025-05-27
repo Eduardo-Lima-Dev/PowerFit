@@ -18,6 +18,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,24 +31,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.powerfit.R
+import com.example.powerfit.model.UserSessionViewModel
 import com.example.powerfit.ui.theme.BottomMenu
-import com.example.powerfit.model.MockAuth
 import com.example.powerfit.ui.theme.CustomNavigationButton
 
-@Preview(showBackground = true)
 @Composable
-fun AssessmentsScreenPreview() {
-    AssessmentsScreen(navController = rememberNavController())
-}
+fun AssessmentsScreen(navController: NavController, viewModel: UserSessionViewModel) {
 
-@Composable
-fun AssessmentsScreen(navController: NavController) {
-    // Redirecionar para login caso não esteja logado
-    if (!MockAuth.isLoggedIn()) {
-        navController.navigate("login") {
-            popUpTo(0) // Limpa toda a pilha de navegação
-        }
-    }
+    val user by viewModel.user
 
     Box(
         modifier = Modifier
@@ -131,6 +122,6 @@ fun AssessmentsScreen(navController: NavController) {
             )
 
         }
-        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter))
+        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter), viewModel)
     }
 }
