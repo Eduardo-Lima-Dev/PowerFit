@@ -1,7 +1,5 @@
 package com.example.powerfit.view.Student
 
-import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
@@ -27,7 +26,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,21 +40,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.controller.ExerciseController
 import com.example.powerfit.controller.ExerciseViewModel
 import com.example.powerfit.model.ExerciseSet
 import com.example.powerfit.model.UserSessionViewModel
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.example.powerfit.view.Student.YouTubeVideoPlayer
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.delay
 
@@ -68,15 +61,11 @@ fun ExerciseViewScreen(
     userViewModel: UserSessionViewModel
 ) {
     val user: MutableLiveData<FirebaseUser?> = MutableLiveData()
-
-    val controller = remember { ExerciseController(navController) }
-    val exercise = controller.getExerciseById(exerciseId)
-    val context = LocalContext.current
+    val exercise = viewModel.getExerciseById(exerciseId)
 
     // Timer state
     var seconds by remember { mutableStateOf(0) }
     var isRunning by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
 
     // Format seconds to MM:SS
     val formattedTime = remember(seconds) {
@@ -90,33 +79,6 @@ fun ExerciseViewScreen(
         while (isRunning) {
             delay(1000)
             seconds++
-        }
-    }
-
-    // ExoPlayer for YouTube video
-    var exoPlayer by remember { mutableStateOf<ExoPlayer?>(null) }
-
-    // Initialize ExoPlayer in a LaunchedEffect
-    if (exercise != null) {
-        LaunchedEffect(exercise.videoUrl) {
-            try {
-                val player = ExoPlayer.Builder(context).build()
-                // Corrigir o formato da URL do YouTube
-                val videoUrl = "https://www.youtube.com/watch?v=${exercise.videoUrl}"
-                val mediaItem = MediaItem.fromUri(videoUrl)
-                player.setMediaItem(mediaItem)
-                player.prepare()
-                exoPlayer = player
-            } catch (e: Exception) {
-                Log.e("ExerciseViewScreen", "Erro ao inicializar o player: ${e.message}")
-            }
-        }
-    }
-
-    // Clean up ExoPlayer when leaving the screen
-    DisposableEffect(Unit) {
-        onDispose {
-            exoPlayer?.release()
         }
     }
 
@@ -172,7 +134,7 @@ fun ExerciseViewScreen(
                 )
             }
 
-            // Video Player
+            // Novo Video Player (YouTube)
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -185,19 +147,14 @@ fun ExerciseViewScreen(
                         .fillMaxSize()
                         .background(Color.Black)
                 ) {
-                    exoPlayer?.let { player ->
-                        AndroidView(
-                            factory = { ctx ->
-                                StyledPlayerView(ctx).apply {
-                                    this.player = player
-                                }
-                            },
+                    if (exercise?.videoUrl != null) {
+                        YouTubeVideoPlayer(
+                            videoUrl = exercise.videoUrl,
                             modifier = Modifier.fillMaxSize()
                         )
-                    } ?: run {
-                        // Mostrar um indicador de carregamento ou mensagem
+                    } else {
                         Text(
-                            text = "Carregando vídeo...",
+                            text = "Vídeo não disponível",
                             color = Color.White,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
@@ -255,7 +212,7 @@ fun ExerciseViewScreen(
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.PlayArrow,
+                        imageVector = if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
                         contentDescription = if (isRunning) "Pausar" else "Iniciar",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(32.dp)
@@ -294,10 +251,8 @@ fun ExerciseViewScreen(
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (exercise != null) {
-                        exercise.sets.forEach { set ->
-                            SetItem(set = set)
-                        }
+                    exercise?.sets?.forEach { set ->
+                        SetItem(set = set)
                     }
                 }
             }

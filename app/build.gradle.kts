@@ -42,6 +42,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx.v1150)
+    implementation (libs.androidx.material.icons.extended)
     implementation(libs.androidx.lifecycle.runtime.ktx.v290)
     implementation(platform(libs.androidx.compose.bom.v20230901))
     implementation(libs.kotlinx.coroutines.play.services)
@@ -52,6 +53,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.dotenv.kotlin)
     implementation(libs.ui)
+    implementation (libs.androidx.ui.viewbinding)
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)

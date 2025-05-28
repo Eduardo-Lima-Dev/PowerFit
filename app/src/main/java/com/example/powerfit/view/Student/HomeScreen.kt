@@ -1,5 +1,6 @@
 package com.example.powerfit.view.Student
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,11 +34,45 @@ import com.example.powerfit.R
 import com.example.powerfit.ui.theme.BottomMenu
 import com.example.powerfit.model.UserSessionViewModel
 import com.example.powerfit.ui.theme.CustomNavigationButton
+import org.threeten.bp.DayOfWeek
+
+@Composable
+fun WeeklyProgressDots(progress: Map<DayOfWeek, Boolean>) {
+    val daysOfWeek = listOf(
+        DayOfWeek.SUNDAY,
+        DayOfWeek.MONDAY,
+        DayOfWeek.TUESDAY,
+        DayOfWeek.WEDNESDAY,
+        DayOfWeek.THURSDAY,
+        DayOfWeek.FRIDAY,
+        DayOfWeek.SATURDAY
+    )
+
+    Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
+        daysOfWeek.forEach { day ->
+            val active = progress[day] == true
+            Box(
+                modifier = Modifier
+                    .size(16.dp)
+                    .clip(CircleShape)
+                    .background(if (active) Color.Green else Color.LightGray)
+            )
+        }
+    }
+}
 
 @Composable
 fun HomeScreen(navController: NavController, viewModel: UserSessionViewModel) {
     val user by viewModel.user
+    val progressState = remember { mutableStateOf<Map<DayOfWeek, Boolean>>(emptyMap()) }
     val isLoading = remember { mutableStateOf(true) }
+    val userId by viewModel.uid
+
+    userId?.let {
+        viewModel.loadWeeklyProgress(it) { progress ->
+            progressState.value = progress
+        }
+    }
 
     LaunchedEffect(user) {
         if (user != null && !user?.name.isNullOrBlank() && !user?.profileImage.isNullOrBlank()) {
@@ -104,16 +140,12 @@ fun HomeScreen(navController: NavController, viewModel: UserSessionViewModel) {
                 ) {
                     val daysOfWeek = listOf("D", "S", "T", "Q", "Q", "S", "S")
 
-                    daysOfWeek.forEachIndexed { index, day ->
+                    daysOfWeek.forEachIndexed { _, day ->
                         Text(
                             text = day,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (index % 2 != 0) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                            }
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -122,25 +154,10 @@ fun HomeScreen(navController: NavController, viewModel: UserSessionViewModel) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp),
+                        .padding(top = 16.dp),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    val daysOfWeek = listOf("D", "S", "T", "Q", "Q", "S", "S")
-
-                    daysOfWeek.forEachIndexed { index, _ ->
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .clip(CircleShape)
-                                .background(
-                                    color = if (index % 2 != 0) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
-                                    }
-                                )
-                        )
-                    }
+                    WeeklyProgressDots(progress = progressState.value)
                 }
 
                 // Botões de Ação

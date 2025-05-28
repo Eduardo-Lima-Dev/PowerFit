@@ -1,7 +1,9 @@
 package com.example.powerfit.view.Student
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,7 +16,9 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,7 +37,6 @@ import com.example.powerfit.model.Exercise
 import com.example.powerfit.model.UserSessionViewModel
 import com.google.firebase.auth.FirebaseUser
 
-@SuppressLint("ViewModelConstructorInComposable")
 @Composable
 fun ExerciseListScreen(
     navController: NavController,
@@ -41,21 +44,24 @@ fun ExerciseListScreen(
     viewModel: ExerciseViewModel,
     userViewModel: UserSessionViewModel
 ) {
-    val user: MutableLiveData<FirebaseUser?> = MutableLiveData()
+    val user by userViewModel.user
 
-    // Verifica se o usuário está autenticado
-    if (user == null) {
-        navController.navigate("login") {
-            popUpTo(0) // Limpa toda a pilha de navegação
-        }
-        return
+    val exercises = remember { mutableStateOf<List<Exercise>>(emptyList()) }
+    val isLoading = remember { mutableStateOf(true) }
+
+    // Delay de 1 segundo
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(1000)
+        isLoading.value = false
     }
 
-    val controller = remember { ExerciseController(navController) }
-
-    // Obter exercícios do Firebase através do ViewModel
-    val exercises = remember(category) {
-        viewModel.exercisesByCategory(category)
+    // Carregar exercícios do Firestore
+    LaunchedEffect(category) {
+        viewModel.loadExercisesFromFirestore(category) { success ->
+            if (success) {
+                exercises.value = viewModel.exercisesByCategory(category)
+            }
+        }
     }
 
     Box(
@@ -70,83 +76,78 @@ fun ExerciseListScreen(
                 )
             )
     ) {
-        // Botão de voltar
-        IconButton(
-            onClick = { navController.navigateUp() },
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(8.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.ArrowBack,
-                contentDescription = "Voltar"
+        if (isLoading.value) {
+            // Indicador de carregamento
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = MaterialTheme.colorScheme.primary
             )
-        }
+        } else {
+            // Botão de voltar
+            IconButton(
+                onClick = { navController.navigateUp() },
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Voltar"
+                )
+            }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Nome do App
-            Text(
-                text = "PowerFit",
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "PowerFit",
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
+                )
 
-            // Imagem de Perfil
-//            user.let { currentUser ->
-//                val painter = rememberAsyncImagePainter(model = currentUser.photoUrl?.toString())
-//
-//                Image(
-//                    painter = painter,
-//                    contentDescription = "User Profile",
-//                    modifier = Modifier
-//                        .size(120.dp)
-//                        .clip(CircleShape)
-//                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-//                        .padding(8.dp)
-//                )
-//            }
+                Text(
+                    text = "Exercícios - $category",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
 
-            // Título da categoria
-            Text(
-                text = "Exercícios - $category",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 16.dp)
-            )
-
-            // Lista de exercícios
-            if (exercises.isEmpty()) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Nenhum exercício encontrado para esta categoria",
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                }
-            } else {
-                LazyColumn {
-                    items(exercises) { exercise ->
-                        ExerciseCard(
-                            exercise = exercise,
-                            navController = navController,
-                            viewModel = viewModel
+                if (exercises.value.isEmpty()) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Nenhum exercício encontrado para esta categoria",
+                            modifier = Modifier.padding(bottom = 16.dp)
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                } else {
+                    LazyColumn {
+                        items(exercises.value) { exercise ->
+                            ExerciseCard(
+                                exercise = exercise,
+                                navController = navController,
+                                viewModel = viewModel
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
                 }
             }
+
+            BottomMenu(
+                navController = navController,
+                modifier = Modifier.align(Alignment.BottomCenter),
+                userViewModel
+            )
         }
-        BottomMenu(navController = navController, modifier = Modifier.align(Alignment.BottomCenter), userViewModel)
     }
 }
 
@@ -157,6 +158,15 @@ fun ExerciseCard(
     viewModel: ExerciseViewModel
 ) {
     val isCompleted = viewModel.isExerciseCompleted(exercise.id)
+
+    val completedToday = remember { mutableStateOf(false) }
+
+    // Carrega progresso do dia ao montar
+    LaunchedEffect(exercise.id) {
+        viewModel.isExerciseCompletedToday(exercise.id) { completed ->
+            completedToday.value = completed
+        }
+    }
 
     Card(
         modifier = Modifier
@@ -175,7 +185,7 @@ fun ExerciseCard(
                 Text(
                     text = exercise.name,
                     style = MaterialTheme.typography.titleLarge,
-                    textDecoration = if (isCompleted) TextDecoration.LineThrough else TextDecoration.None
+                    textDecoration = if (completedToday.value) TextDecoration.LineThrough else TextDecoration.None
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -184,17 +194,21 @@ fun ExerciseCard(
                     Text(
                         text = "${set.sets}x${set.reps} repetições",
                         style = MaterialTheme.typography.bodyMedium,
-                        textDecoration = if (isCompleted) TextDecoration.LineThrough else TextDecoration.None
+                        textDecoration = if (completedToday.value) TextDecoration.LineThrough else TextDecoration.None
                     )
                 }
             }
 
             Row {
-                IconButton(onClick = { viewModel.toggleExerciseCompletion(exercise.id) }) {
+                IconButton(onClick = {
+                    viewModel.toggleExerciseTodayStatus(exercise.id) { newStatus ->
+                        completedToday.value = newStatus
+                    }
+                }) {
                     Icon(
-                        imageVector = if (isCompleted) Icons.Default.CheckCircle else Icons.Default.Done,
+                        imageVector = if (completedToday.value) Icons.Default.CheckCircle else Icons.Default.Done,
                         contentDescription = "Marcar como concluído",
-                        tint = if (isCompleted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        tint = if (completedToday.value) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                     )
                 }
 

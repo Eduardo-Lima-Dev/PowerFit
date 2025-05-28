@@ -20,14 +20,18 @@ import kotlinx.coroutines.tasks.await
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.threeten.bp.DayOfWeek
+import org.threeten.bp.LocalDate
+import org.threeten.bp.format.DateTimeFormatter
 
 class UserSessionViewModel : ViewModel() {
     private val _user = mutableStateOf<User?>(null)
+    private val _uid = mutableStateOf<String?>(null)
     val user: State<User?> get() = _user
+    val uid: State<String?> get() = _uid
 
     suspend fun loadUser(): Boolean {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return false
-
         return try {
             val documentSnapshot = Firebase.firestore
                 .collection("usuarios")
@@ -36,6 +40,7 @@ class UserSessionViewModel : ViewModel() {
                 .await()
 
             val user = documentSnapshot.toObject(User::class.java)
+            _uid.value = uid
             _user.value = user
             user?.role == Role.TEACHER
         } catch (e: Exception) {
@@ -105,6 +110,29 @@ class UserSessionViewModel : ViewModel() {
         }
     }
 
+    fun loadWeeklyProgress(userId: String, onResult: (Map<DayOfWeek, Boolean>) -> Unit) {
+        val today = LocalDate.now()
+        val daysSinceSunday = (today.dayOfWeek.value % 7) // domingo = 0, segunda = 1, ..., sábado = 6
+        val startOfWeek = today.minusDays(daysSinceSunday.toLong())
+        val formatter = DateTimeFormatter.ISO_DATE
+
+        Firebase.firestore.collection("user_progress")
+            .document(userId)
+            .get()
+            .addOnSuccessListener { doc ->
+                val progressMap = mutableMapOf<DayOfWeek, Boolean>()
+
+                for (i in 0..6) {
+                    val date = startOfWeek.plusDays(i.toLong())
+                    val key = date.format(formatter)
+                    val day = date.dayOfWeek
+                    progressMap[day] = doc.getBoolean(key) == true
+                }
+
+                onResult(progressMap)
+            }
+    }
+
     fun uploadProfileImage(
         context: Context,
         imageUri: Uri,
@@ -160,5 +188,49 @@ class UserSessionViewModel : ViewModel() {
                 onResult(false, "Exceção: ${e.message}")
             }
         }
+    }
+
+    suspend fun fetchWeeklyPresenceCounts(userId: String): Map<out Any, Int> {
+        val doc = FirebaseFirestore.getInstance()
+            .collection("user_progress")
+            .document(userId)
+            .get()
+            .await()
+
+        if (!doc.exists()) {
+            return DayOfWeek.values().associateWith { 0 }
+        }
+
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        // Inicializa mapa com zero para todos os dias
+        val counts = DayOfWeek.values().associateWith { 0 }.toMutableMap()
+
+        for ((key, value) in doc.data ?: emptyMap()) {
+            // Verifica se a chave é uma data válida no formato yyyy-MM-dd
+            val date = try {
+                LocalDate.parse(key, formatter)
+            } catch (e: Exception) {
+                null
+            }
+
+            if (date != null) {
+                val present = value as? Boolean ?: false
+                if (present) {
+                    val dayOfWeek = date.dayOfWeek
+                    counts[dayOfWeek] = counts.getValue(dayOfWeek) + 1
+                }
+            }
+        }
+        val countsFormatado: Map<String, Int> = linkedMapOf(
+            "Domingo" to counts.getOrDefault(DayOfWeek.SUNDAY, 0),
+            "Segunda" to counts.getOrDefault(DayOfWeek.MONDAY, 0),
+            "Terça" to counts.getOrDefault(DayOfWeek.TUESDAY, 0),
+            "Quarta" to counts.getOrDefault(DayOfWeek.WEDNESDAY, 0),
+            "Quinta" to counts.getOrDefault(DayOfWeek.THURSDAY, 0),
+            "Sexta" to counts.getOrDefault(DayOfWeek.FRIDAY, 0),
+            "Sábado" to counts.getOrDefault(DayOfWeek.SATURDAY, 0),
+        )
+
+        return countsFormatado
     }
 }
