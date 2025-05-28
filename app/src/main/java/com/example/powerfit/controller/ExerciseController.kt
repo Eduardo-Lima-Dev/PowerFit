@@ -55,8 +55,20 @@ class ExerciseController(private val navController: NavController) {
     }
 
     // Obtém um exercício pelo ID
-    fun getExerciseById(id: String): Exercise? {
-        return _exercises.value.find { it.id == id }
+    fun getExerciseById(exerciseId: String, onSuccess: (Exercise?) -> Unit) {
+        db.collection("exercises").document(exerciseId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val exercise = document.toObject(Exercise::class.java)
+                    onSuccess(exercise)
+                } else {
+                    onSuccess(null)
+                }
+            }
+            .addOnFailureListener {
+                onSuccess(null)
+            }
     }
 
     // Adiciona um novo exercício

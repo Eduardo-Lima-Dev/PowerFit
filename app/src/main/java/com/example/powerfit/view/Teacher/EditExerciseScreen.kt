@@ -22,6 +22,9 @@ import com.example.powerfit.model.ExerciseSet
 import com.example.powerfit.model.Student
 import com.example.powerfit.model.StudentViewModel
 import com.example.powerfit.model.UserSessionViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +35,6 @@ fun EditExerciseScreen(
     exerciseId: String? = null,
     userViewModel: UserSessionViewModel
 ) {
-
     val user by userViewModel.user
 
     val viewModel: StudentViewModel = viewModel()
@@ -51,14 +53,32 @@ fun EditExerciseScreen(
 
     val exerciseController = remember { ExerciseController(navController) }
     val isEditMode = exerciseId != null
-    val exercise = remember { exerciseId?.let { exerciseController.getExerciseById(it) } }
 
-    var exerciseName by remember { mutableStateOf(exercise?.name ?: "") }
-    var exerciseDescription by remember { mutableStateOf(exercise?.description ?: "") }
-    var exerciseVideoUrl by remember { mutableStateOf(exercise?.videoUrl ?: "") }
-    var exerciseSets by remember { mutableStateOf(exercise?.sets?.firstOrNull()?.sets?.toString() ?: "3") }
-    var exerciseReps by remember { mutableStateOf(exercise?.sets?.firstOrNull()?.reps?.toString() ?: "12") }
-    var exerciseWeight by remember { mutableStateOf(exercise?.sets?.firstOrNull()?.weight?.toString() ?: "0") }
+    // Estados para controlar o formulário
+    var exerciseName by remember { mutableStateOf("") }
+    var exerciseDescription by remember { mutableStateOf("") }
+    var exerciseVideoUrl by remember { mutableStateOf("") }
+    var exerciseSets by remember { mutableStateOf("3") }
+    var exerciseReps by remember { mutableStateOf("12") }
+    var exerciseWeight by remember { mutableStateOf("0") }
+    var isLoading by remember { mutableStateOf(isEditMode) }
+
+    // Carregar dados quando em modo de edição
+    LaunchedEffect(exerciseId) {
+        if (isEditMode && exerciseId != null) {
+            exerciseController.getExerciseById(exerciseId) { exercise ->
+                if (exercise != null) {
+                    exerciseName = exercise.name ?: ""
+                    exerciseDescription = exercise.description ?: ""
+                    exerciseVideoUrl = exercise.videoUrl ?: ""
+                    exerciseSets = exercise.sets?.firstOrNull()?.sets?.toString() ?: "3"
+                    exerciseReps = exercise.sets?.firstOrNull()?.reps?.toString() ?: "12"
+                    exerciseWeight = exercise.sets?.firstOrNull()?.weight?.toString() ?: "0"
+                }
+                isLoading = false
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -73,143 +93,155 @@ fun EditExerciseScreen(
             ),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .widthIn(max = 500.dp)
-                .padding(horizontal = 32.dp, vertical = 48.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+        if (isLoading) {
+            CircularProgressIndicator()
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .widthIn(max = 500.dp)
+                    .padding(horizontal = 32.dp, vertical = 48.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBack, "Voltar")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, "Voltar")
+                    }
+
+                    Text(
+                        text = if (isEditMode) "Editar Exercício" else "Adicionar Exercício",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    Spacer(modifier = Modifier.size(48.dp))
                 }
+
+                Spacer(modifier = Modifier.height(48.dp))
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Aluno: ${student.name}",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Categoria: $category",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                OutlinedTextField(
+                    value = exerciseName,
+                    onValueChange = { exerciseName = it },
+                    label = { Text("Nome do Exercício") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = exerciseDescription,
+                    onValueChange = { exerciseDescription = it },
+                    label = { Text("Descrição") },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 3
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = exerciseVideoUrl,
+                    onValueChange = { exerciseVideoUrl = it },
+                    label = { Text("URL do Vídeo") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
-                    text = if (isEditMode) "Editar Exercício" else "Adicionar Exercício",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    text = "Configuração do Treino",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.size(48.dp))
-            }
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.height(48.dp))
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-                )
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = "Aluno: ${student.name}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                    OutlinedTextField(
+                        value = exerciseSets,
+                        onValueChange = { exerciseSets = it },
+                        label = { Text("Séries") },
+                        modifier = Modifier.weight(1f)
                     )
-                    Text(
-                        text = "Categoria: $category",
-                        style = MaterialTheme.typography.bodyMedium
+
+                    OutlinedTextField(
+                        value = exerciseReps,
+                        onValueChange = { exerciseReps = it },
+                        label = { Text("Repetições") },
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    OutlinedTextField(
+                        value = exerciseWeight,
+                        onValueChange = { exerciseWeight = it },
+                        label = { Text("Peso (kg)") },
+                        modifier = Modifier.weight(1f)
                     )
                 }
-            }
 
-            Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
-            OutlinedTextField(
-                value = exerciseName,
-                onValueChange = { exerciseName = it },
-                label = { Text("Nome do Exercício") },
-                modifier = Modifier.fillMaxWidth()
-            )
+                Button(
+                    onClick = {
+                        val newExercise = Exercise(
+                            id = exerciseId ?: "novo_id",
+                            name = exerciseName,
+                            category = category,
+                            videoUrl = exerciseVideoUrl,
+                            sets = listOf(
+                                ExerciseSet(
+                                    sets = exerciseSets.toIntOrNull() ?: 3,
+                                    reps = exerciseReps.toIntOrNull() ?: 12,
+                                    weight = exerciseWeight.toFloatOrNull() ?: 0f
+                                )
+                            ),
+                            description = exerciseDescription,
+                            studentId = studentId
+                        )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = exerciseDescription,
-                onValueChange = { exerciseDescription = it },
-                label = { Text("Descrição") },
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 3
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = exerciseVideoUrl,
-                onValueChange = { exerciseVideoUrl = it },
-                label = { Text("URL do Vídeo") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                text = "Configuração do Treino",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedTextField(
-                    value = exerciseSets,
-                    onValueChange = { exerciseSets = it },
-                    label = { Text("Séries") },
-                    modifier = Modifier.weight(1f)
-                )
-
-                OutlinedTextField(
-                    value = exerciseReps,
-                    onValueChange = { exerciseReps = it },
-                    label = { Text("Repetições") },
-                    modifier = Modifier.weight(1f)
-                )
-
-                OutlinedTextField(
-                    value = exerciseWeight,
-                    onValueChange = { exerciseWeight = it },
-                    label = { Text("Peso (kg)") },
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Button(
-                onClick = {
-                    val newExercise = Exercise(
-                        id = exerciseId ?: "novo_id",
-                        name = exerciseName,
-                        category = category,
-                        videoUrl = exerciseVideoUrl,
-                        sets = listOf(
-                            ExerciseSet(
-                                sets = exerciseSets.toIntOrNull() ?: 3,
-                                reps = exerciseReps.toIntOrNull() ?: 12,
-                                weight = exerciseWeight.toFloatOrNull() ?: 0f
-                            )
-                        ),
-                        description = exerciseDescription
-                    )
-
-                    navController.popBackStack()
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Salvar Exercício")
+                        CoroutineScope(Dispatchers.IO).launch {
+                            if (isEditMode) {
+                                exerciseController.updateExercise(newExercise)
+                            } else {
+                                exerciseController.addExercise(newExercise)
+                            }
+                            navController.popBackStack()
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Salvar Exercício")
+                }
             }
         }
 
