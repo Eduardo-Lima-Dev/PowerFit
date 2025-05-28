@@ -204,6 +204,7 @@ fun ExerciseCard(
                     viewModel.toggleExerciseTodayStatus(exercise.id) { newStatus ->
                         completedToday.value = newStatus
                     }
+                    viewModel.markExerciseDone(exercise.id)
                 }) {
                     Icon(
                         imageVector = if (completedToday.value) Icons.Default.CheckCircle else Icons.Default.Done,
