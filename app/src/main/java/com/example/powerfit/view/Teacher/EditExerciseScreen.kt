@@ -27,7 +27,7 @@ import com.example.powerfit.model.UserSessionViewModel
 @Composable
 fun EditExerciseScreen(
     navController: NavController,
-    studentId: Int,
+    studentId: String,
     category: String,
     exerciseId: String? = null,
     userViewModel: UserSessionViewModel

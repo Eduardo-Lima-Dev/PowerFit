@@ -128,15 +128,15 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel, userSessionViewModel: UserS
         composable(
             route = "editExercise/{studentId}/{exerciseId}",
             arguments = listOf(
-                navArgument("studentId") { type = NavType.IntType },
+                navArgument("studentId") { type = NavType.StringType },
                 navArgument("exerciseId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val studentId = backStackEntry.arguments?.getInt("studentId") ?: 0
+            val studentId = backStackEntry.arguments?.getString("studentId") ?: 0
             val exerciseId = backStackEntry.arguments?.getString("exerciseId") ?: ""
             EditExerciseScreen(
                 navController = navController,
-                studentId = studentId,
+                studentId = studentId.toString(),
                 category = sharedViewModel.getExerciseById(exerciseId)?.category ?: "",
                 exerciseId = exerciseId,
                 userSessionViewModel
@@ -145,16 +145,16 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel, userSessionViewModel: UserS
         composable(
             route = "addExercise/{studentId}/{category}",
             arguments = listOf(
-                navArgument("studentId") { type = NavType.IntType },
+                navArgument("studentId") { type = NavType.StringType },
                 navArgument("category") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val studentId = backStackEntry.arguments?.getInt("studentId") ?: 0
+            val studentId = backStackEntry.arguments?.getString("studentId") ?: 0
             val category = backStackEntry.arguments?.getString("category") ?: ""
             val exerciseId = backStackEntry.arguments?.getString("exerciseId") ?: ""
             EditExerciseScreen(
                 navController = navController,
-                studentId = studentId,
+                studentId = studentId.toString(),
                 category = category,
                 exerciseId = exerciseId,
                 userSessionViewModel
