@@ -9,6 +9,14 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+data class StudentAssessment(
+    val name: String = "",
+    val age: Int = 0,
+    val weight: Int = 0,
+    val trains: Boolean = false,
+    val hasComorbidity: Boolean = false
+)
+
 data class Student(
     val id: String = "",
     val name: String = "",

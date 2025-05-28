@@ -233,4 +233,21 @@ class UserSessionViewModel : ViewModel() {
 
         return countsFormatado
     }
+
+    suspend fun getLinkedStudent(): StudentAssessment? {
+        val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: return null
+
+        return try {
+            val snapshot = Firebase.firestore
+                .collection("vinculatedStudents")
+                .document(currentUid)
+                .get()
+                .await()
+
+            snapshot.toObject(StudentAssessment::class.java)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
 }
