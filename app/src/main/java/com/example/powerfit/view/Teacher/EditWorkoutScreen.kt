@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -26,13 +27,13 @@ import com.example.powerfit.model.UserSessionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditWorkoutsScreen(navController: NavController, studentId: Int, userViewModel: UserSessionViewModel) {
+fun EditWorkoutsScreen(navController: NavController, studentId: String, userViewModel: UserSessionViewModel) {
     val user by userViewModel.user
 
     val studentViewModel: StudentViewModel = viewModel()
     val student by remember {
         derivedStateOf {
-            studentViewModel.vinculatedStudents.value.find { it.id == studentId.toString() } ?: Student(
+            studentViewModel.vinculatedStudents.value.find { it.id == studentId } ?: Student(
                 id = "0",
                 name = "",
                 age = 0,
@@ -48,8 +49,10 @@ fun EditWorkoutsScreen(navController: NavController, studentId: Int, userViewMod
     var selectedCategory by remember { mutableStateOf(categories.first()) }
     var expanded by remember { mutableStateOf(false) }
 
-    val exercisesInCategory = remember(selectedCategory) {
-        exerciseController.getExercisesByCategory(selectedCategory)
+    val exercisesInCategory by produceState(initialValue = emptyList<Exercise>(), selectedCategory, studentId) {
+        exerciseController.getExercisesByCategoryFromFirebase(selectedCategory, studentId) { exercises ->
+            value = exercises
+        }
     }
 
     Box(
@@ -187,20 +190,48 @@ fun EditWorkoutsScreen(navController: NavController, studentId: Int, userViewMod
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            LazyColumn(
+            // Box para mostrar exercícios ou mensagem quando não há exercícios
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
             ) {
-                items(exercisesInCategory) { exercise ->
-                    ExerciseItem(
-                        exercise = exercise,
-                        onEditClick = {
-                            // Navegar para a tela de edição de exercício específico
-                            navController.navigate("editExercise/${studentId}/${exercise.id}")
+                if (exercisesInCategory.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Nenhum exercício cadastrado nesta categoria para este aluno",
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "Adicione um novo exercício usando o botão acima",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                } else {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(exercisesInCategory) { exercise ->
+                            ExerciseItem(
+                                exercise = exercise,
+                                onEditClick = {
+                                    // Navegar para a tela de edição de exercício específico
+                                    navController.navigate("editExercise/${studentId}/${exercise.id}")
+                                }
+                            )
+                            Divider()
                         }
-                    )
-                    Divider()
+                    }
                 }
             }
         }

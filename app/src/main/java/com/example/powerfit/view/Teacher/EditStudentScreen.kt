@@ -35,7 +35,7 @@ fun EditStudentScreen(navController: NavController, studentId: String, userViewM
     val vinculatedStudents = studentViewModel.vinculatedStudents.value
     val student by remember(vinculatedStudents) {
         mutableStateOf(
-            vinculatedStudents.find { it.id == studentId.toString() } ?: Student(
+            vinculatedStudents.find { it.id == studentId } ?: Student(
                 id = "0",
                 name = "",
                 age = 0,
