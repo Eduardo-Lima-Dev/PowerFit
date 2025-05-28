@@ -123,11 +123,7 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel, userSessionViewModel: UserS
         }
         composable("editWorkouts/{studentId}") { backStackEntry ->
             val studentId = backStackEntry.arguments?.getString("studentId") ?: ""
-            EditWorkoutsScreen(
-                navController = navController,
-                studentId = studentId,
-                userSessionViewModel
-            )
+            EditWorkoutsScreen(navController = navController, studentId = studentId, userViewModel = userSessionViewModel)
         }
         composable(
             route = "editExercise/{studentId}/{exerciseId}",

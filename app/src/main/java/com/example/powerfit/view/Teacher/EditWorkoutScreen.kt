@@ -1,5 +1,6 @@
 package com.example.powerfit.view.Teacher
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,14 +29,15 @@ import com.example.powerfit.model.UserSessionViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditWorkoutsScreen(navController: NavController, studentId: String, userViewModel: UserSessionViewModel) {
+    Log.d("EditWorkoutsScreen", "Iniciando tela com studentId: $studentId")
     val user by userViewModel.user
 
     val studentViewModel: StudentViewModel = viewModel()
     val student by remember {
         derivedStateOf {
             studentViewModel.vinculatedStudents.value.find { it.id == studentId } ?: Student(
-                id = "0",
-                name = "",
+                id = studentId,
+                name = "Aluno não encontrado",
                 age = 0,
                 trains = false,
                 hasComorbidity = false,
@@ -50,8 +52,13 @@ fun EditWorkoutsScreen(navController: NavController, studentId: String, userView
     var expanded by remember { mutableStateOf(false) }
 
     val exercisesInCategory by produceState(initialValue = emptyList<Exercise>(), selectedCategory, studentId) {
-        exerciseController.getExercisesByCategoryFromFirebase(selectedCategory, studentId) { exercises ->
-            value = exercises
+        try {
+            exerciseController.getExercisesByCategoryFromFirebase(selectedCategory, studentId) { exercises ->
+                value = exercises
+            }
+        } catch (e: Exception) {
+            Log.e("EditWorkoutsScreen", "Erro ao buscar exercícios: ${e.message}", e)
+            value = emptyList()
         }
     }
 
