@@ -47,7 +47,7 @@ fun EditWorkoutsScreen(navController: NavController, studentId: String, userView
     }
 
     val exerciseController = remember { ExerciseController(navController) }
-    val categories = listOf("Superior", "Costas", "Peito", "Inferior")
+    val categories = listOf("Superior", "Costas", "Inferior")
     var selectedCategory by remember { mutableStateOf(categories.first()) }
     var expanded by remember { mutableStateOf(false) }
 
