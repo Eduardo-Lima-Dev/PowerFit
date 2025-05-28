@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,6 +26,9 @@ import com.example.powerfit.model.Exercise
 import com.example.powerfit.model.Student
 import com.example.powerfit.model.StudentViewModel
 import com.example.powerfit.model.UserSessionViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +55,10 @@ fun EditWorkoutsScreen(navController: NavController, studentId: String, userView
     var selectedCategory by remember { mutableStateOf(categories.first()) }
     var expanded by remember { mutableStateOf(false) }
 
-    val exercisesInCategory by produceState(initialValue = emptyList<Exercise>(), selectedCategory, studentId) {
+    // Variável para forçar atualização da lista após exclusões
+    var refreshTrigger by remember { mutableStateOf(0) }
+
+    val exercisesInCategory by produceState(initialValue = emptyList<Exercise>(), selectedCategory, studentId, refreshTrigger) {
         try {
             exerciseController.getExercisesByCategoryFromFirebase(selectedCategory, studentId) { exercises ->
                 value = exercises
@@ -126,7 +133,7 @@ fun EditWorkoutsScreen(navController: NavController, studentId: String, userView
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Dropdown de categorias e botão de adicionar
+            // Dropdown de categorias e botão de adicionar (removido botão de excluir)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -229,13 +236,52 @@ fun EditWorkoutsScreen(navController: NavController, studentId: String, userView
                 } else {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(exercisesInCategory) { exercise ->
+                            var showDeleteExerciseDialog by remember { mutableStateOf(false) }
+
                             ExerciseItem(
                                 exercise = exercise,
                                 onEditClick = {
                                     // Navegar para a tela de edição de exercício específico
                                     navController.navigate("editExercise/${studentId}/${exercise.id}")
+                                },
+                                onDeleteClick = {
+                                    // Mostrar diálogo de confirmação para deletar o exercício
+                                    showDeleteExerciseDialog = true
                                 }
                             )
+
+                            // Diálogo de confirmação para exclusão de exercício individual
+                            if (showDeleteExerciseDialog) {
+                                AlertDialog(
+                                    onDismissRequest = { showDeleteExerciseDialog = false },
+                                    title = { Text("Confirmação") },
+                                    text = { Text("Deseja realmente excluir o exercício '${exercise.name}'?") },
+                                    confirmButton = {
+                                        Button(
+                                            onClick = {
+                                                // Excluir exercício e atualizar a lista
+                                                CoroutineScope(Dispatchers.Main).launch {
+                                                    exerciseController.deleteExercise(exercise.id)
+                                                    // Incrementar o trigger para forçar a recarga dos dados
+                                                    refreshTrigger++
+                                                    showDeleteExerciseDialog = false
+                                                }
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = MaterialTheme.colorScheme.error
+                                            )
+                                        ) {
+                                            Text("Excluir")
+                                        }
+                                    },
+                                    dismissButton = {
+                                        OutlinedButton(onClick = { showDeleteExerciseDialog = false }) {
+                                            Text("Cancelar")
+                                        }
+                                    }
+                                )
+                            }
+
                             Divider()
                         }
                     }
@@ -248,7 +294,11 @@ fun EditWorkoutsScreen(navController: NavController, studentId: String, userView
 }
 
 @Composable
-fun ExerciseItem(exercise: Exercise, onEditClick: () -> Unit) {
+fun ExerciseItem(
+    exercise: Exercise,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -272,12 +322,23 @@ fun ExerciseItem(exercise: Exercise, onEditClick: () -> Unit) {
             )
         }
 
-        IconButton(onClick = onEditClick) {
-            Icon(
-                imageVector = Icons.Default.Edit,
-                contentDescription = "Editar exercício",
-                tint = MaterialTheme.colorScheme.primary
-            )
+        // Botões agrupados lado a lado
+        Row {
+            IconButton(onClick = onEditClick) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Editar exercício",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            IconButton(onClick = onDeleteClick) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Excluir exercício",
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
         }
     }
 }

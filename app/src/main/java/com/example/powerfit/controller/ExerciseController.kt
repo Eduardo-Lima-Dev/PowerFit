@@ -1,5 +1,6 @@
 package com.example.powerfit.controller
 
+import android.util.Log
 import androidx.navigation.NavController
 import com.example.powerfit.model.Exercise
 import com.example.powerfit.model.ExerciseSet
@@ -109,18 +110,42 @@ class ExerciseController(private val navController: NavController) {
     }
 
     // Remove um exercício
-    suspend fun deleteExercise(exerciseId: String): Boolean {
-        return try {
-            exercisesCollection.document(exerciseId).delete().await()
+    // No arquivo ExerciseController.kt
+    fun deleteExercisesByCategory(studentId: String, category: String) {
+        val db = FirebaseFirestore.getInstance()
 
-            // Atualiza o estado local
-            val currentExercises = _exercises.value.toMutableList()
-            currentExercises.removeAll { it.id == exerciseId }
-            _exercises.value = currentExercises
+        db.collection("exercises")
+            .whereEqualTo("studentId", studentId)
+            .whereEqualTo("category", category)
+            .get()
+            .addOnSuccessListener { documents ->
+                val batch = db.batch()
+                for (document in documents) {
+                    batch.delete(document.reference)
+                }
+                batch.commit().addOnSuccessListener {
+                    Log.d("ExerciseController", "Exercícios da categoria $category excluídos com sucesso")
+                }.addOnFailureListener { e ->
+                    Log.e("ExerciseController", "Erro ao excluir exercícios: ${e.message}")
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("ExerciseController", "Erro ao buscar exercícios para exclusão: ${e.message}")
+            }
+    }
 
-            true
-        } catch (e: Exception) {
-            false
-        }
+    // Adicione este método ao ExerciseController.kt
+    fun deleteExercise(exerciseId: String) {
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("exercises")
+            .document(exerciseId)
+            .delete()
+            .addOnSuccessListener {
+                Log.d("ExerciseController", "Exercício excluído com sucesso")
+            }
+            .addOnFailureListener { e ->
+                Log.e("ExerciseController", "Erro ao excluir exercício: ${e.message}")
+            }
     }
 }
