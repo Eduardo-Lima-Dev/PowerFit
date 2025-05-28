@@ -34,6 +34,7 @@ import com.example.powerfit.view.Student.ExerciseListScreen
 import com.example.powerfit.view.Student.ExerciseSelectionScreen
 import com.example.powerfit.view.Student.ExerciseViewScreen
 import com.example.powerfit.view.Student.HomeScreen
+import com.example.powerfit.view.Teacher.AddExerciseScreen
 import com.example.powerfit.view.Teacher.EditExerciseScreen
 import com.example.powerfit.view.Teacher.EditStudentScreen
 import com.example.powerfit.view.Teacher.EditWorkoutsScreen
@@ -151,12 +152,10 @@ fun SetupNavHost(sharedViewModel: ExerciseViewModel, userSessionViewModel: UserS
         ) { backStackEntry ->
             val studentId = backStackEntry.arguments?.getString("studentId") ?: 0
             val category = backStackEntry.arguments?.getString("category") ?: ""
-            val exerciseId = backStackEntry.arguments?.getString("exerciseId") ?: ""
-            EditExerciseScreen(
+            AddExerciseScreen(
                 navController = navController,
                 studentId = studentId.toString(),
                 category = category,
-                exerciseId = exerciseId,
                 userSessionViewModel
             )
         }

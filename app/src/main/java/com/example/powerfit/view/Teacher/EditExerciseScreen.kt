@@ -25,6 +25,8 @@ import com.example.powerfit.model.UserSessionViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +65,9 @@ fun EditExerciseScreen(
     var exerciseWeight by remember { mutableStateOf("0") }
     var isLoading by remember { mutableStateOf(isEditMode) }
 
+    // Variável para armazenar a categoria do exercício
+    var exerciseCategory by remember { mutableStateOf(category) }
+
     // Carregar dados quando em modo de edição
     LaunchedEffect(exerciseId) {
         if (isEditMode && exerciseId != null) {
@@ -74,6 +79,8 @@ fun EditExerciseScreen(
                     exerciseSets = exercise.sets?.firstOrNull()?.sets?.toString() ?: "3"
                     exerciseReps = exercise.sets?.firstOrNull()?.reps?.toString() ?: "12"
                     exerciseWeight = exercise.sets?.firstOrNull()?.weight?.toString() ?: "0"
+                    // Atualizar a categoria com o valor do Firebase
+                    exerciseCategory = exercise.category ?: category
                 }
                 isLoading = false
             }
@@ -138,7 +145,7 @@ fun EditExerciseScreen(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Categoria: $category",
+                            text = "Categoria: $exerciseCategory",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -214,9 +221,9 @@ fun EditExerciseScreen(
                 Button(
                     onClick = {
                         val newExercise = Exercise(
-                            id = exerciseId ?: "novo_id",
+                            id = exerciseId ?: UUID.randomUUID().toString(),
                             name = exerciseName,
-                            category = category,
+                            category = exerciseCategory,
                             videoUrl = exerciseVideoUrl,
                             sets = listOf(
                                 ExerciseSet(
@@ -230,12 +237,22 @@ fun EditExerciseScreen(
                         )
 
                         CoroutineScope(Dispatchers.IO).launch {
-                            if (isEditMode) {
-                                exerciseController.updateExercise(newExercise)
-                            } else {
-                                exerciseController.addExercise(newExercise)
+                            try {
+                                if (isEditMode) {
+                                    exerciseController.updateExercise(newExercise)
+                                } else {
+                                    exerciseController.addExercise(newExercise)
+                                }
+
+                                withContext(Dispatchers.Main) {
+                                    navController.popBackStack()
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                withContext(Dispatchers.Main) {
+                                    // Opcional: mostrar mensagem de erro
+                                }
                             }
-                            navController.popBackStack()
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
