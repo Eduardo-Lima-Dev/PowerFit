@@ -1,5 +1,7 @@
 package com.example.powerfit.view.Student
 
+import android.util.Log
+import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -16,11 +18,17 @@ fun YouTubeVideoPlayer(videoUrl: String, modifier: Modifier = Modifier) {
 
     AndroidView(
         factory = { context ->
+            Log.d("YouTubePlayer", "Criando WebView para $embedUrl")
             WebView(context).apply {
                 webViewClient = WebViewClient()
+                webChromeClient = WebChromeClient() // Ajuda na reprodução de vídeo
                 settings.javaScriptEnabled = true
+                settings.domStorageEnabled = true
                 settings.loadWithOverviewMode = true
                 settings.useWideViewPort = true
+                settings.mediaPlaybackRequiresUserGesture = false
+                settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                settings.userAgentString = WebSettings.getDefaultUserAgent(context)
                 loadUrl(embedUrl)
             }
         },
@@ -32,5 +40,5 @@ fun YouTubeVideoPlayer(videoUrl: String, modifier: Modifier = Modifier) {
 
 // Função utilitária para extrair o ID do vídeo do YouTube
 fun extractYoutubeVideoId(url: String): String {
-    return url.substringAfter("v=").substringBefore("&")
+    return if (url.contains("youtu.be/")) url.substringAfter("youtu.be/").substringBefore("?") else url.substringAfter("v=").substringBefore("&")
 }
